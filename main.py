@@ -8,7 +8,7 @@ from sentence_transformers import SentenceTransformer
 from typing import List
 
 # Configuración
-DATA_FOLDER = "markdown_files"
+DATA_FOLDER = "./fib_markdown"
 CHROMA_DB_FOLDER = "chromadb_store"
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
