@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from fastapi import FastAPI, Query
 
 # Configuración
-DATA_FOLDER = "markdown_files"
+DATA_FOLDER = "./fib_markdown"
 CHROMA_DB_FOLDER = "chromadb_store"
 OPENAI_MODEL = "text-embedding-3-small"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
