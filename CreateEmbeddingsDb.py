@@ -21,7 +21,7 @@ if not OPENAI_API_KEY:
 
 # Inicializar ChromaDB
 chroma_client = chromadb.PersistentClient(path=CHROMA_DB_FOLDER)
-collection = chroma_client.get_or_create_collection(name="markdown_docs")
+collection = chroma_client.get_or_create_collection(name="markdown_docs_en")
 
 # Configurar cliente OpenAI
 client = openai.OpenAI(api_key=OPENAI_API_KEY)
@@ -72,7 +72,9 @@ def get_openai_embedding(text):
 
 # Función para dividir el texto en frases
 def split_into_sentences(text):
-    sentences = re.split(r'(?<=[.!?])\s+|\n+', text)
+    sentences = re.split(r'(?<=[.!?])\s+', text)
+   # sentences = re.split('r'(?<=[.!?])\s+', text)
+    #sentences = re.split(r'(?<=[.!?])\s+|\n+', text)
     return [s.strip() for s in sentences if s.strip()]
 
 
@@ -111,41 +113,5 @@ def process_markdown_files():
 
 
 # Cargar los documentos si no están indexados aún
-#if len(collection.get()['ids']) == 0:
-process_markdown_files()
-
-#
-## Crear API con FastAPI
-#app = FastAPI()
-#
-#
-#@app.get("/search")
-#def search(query: str = Query(..., title="Search query")):
-#    # Generar embedding de la consulta con OpenAI
-#    query_embedding = get_openai_embedding(query)
-#    if not query_embedding:
-#        return {"message": "Error generating embedding for query."}
-#
-#    # Buscar en ChromaDB
-#    results = collection.query(
-#        query_embeddings=query_embedding,
-#        n_results=1
-#    )
-#
-#    if results["ids"]:
-#        best_match = results["metadatas"][0][0]
-#        return {
-#            "filename": best_match["filename"],
-#            "url": f"{BASE_URL}{best_match['filename'].replace('fib_markdown','').replace(os.sep, '/').replace('//','/').replace('.md','')}",
-#            "sentence": best_match["sentence"],
-#            "sentence_index": best_match["sentence_index"]
-#        }
-#    else:
-#        return {"message": "No matching content found"}
-#
-#
-#if __name__ == "__main__":
-#    import uvicorn
-#
-#    uvicorn.run(app, host="127.0.0.1", port=8000)
-#
+if len(collection.get()['ids']) == 0:
+    process_markdown_files()

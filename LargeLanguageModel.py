@@ -1,31 +1,46 @@
 import os
 import chromadb
 import openai
-import requests
+import json
 from bs4 import BeautifulSoup
+from google import genai
+
+# Configuration paths
+CONFIG_FILE = "config.json"
+
+# Load configuration
+with open(CONFIG_FILE, 'r', encoding='utf-8') as config_file:
+    config = json.load(config_file)
+
+PROMPT_IMPROVEMENT = config["prompt_improvement"]
+LLM_PROMPT_TEMPLATE = config["llm_prompt_template"]
 
 # Configuración
 CHROMA_DB_FOLDER = "chromadb_store"
 OPENAI_MODEL = "text-embedding-3-small"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-HUGGINGFACE_MODEL_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
-HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 
 MAX_CALLS = 100000
 MAX_TOKENS = 16000
 call_count = 0
 
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+# URLs for Gemini API
+GEMINI_LLM_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent"
+
+
 if not OPENAI_API_KEY:
     raise ValueError("No OpenAI API key found. Set the OPENAI_API_KEY environment variable.")
 
-if not HUGGINGFACE_API_KEY:
-    raise ValueError("No Hugging Face API key found. Set the HUGGINGFACE_API_KEY environment variable.")
 
-headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
+if not GEMINI_API_KEY:
+    raise ValueError("No Gemini API key found. Set the GEMINI_API_KEY environment variable.")
+
 
 # Inicializar ChromaDB
 chroma_client = chromadb.PersistentClient(path=CHROMA_DB_FOLDER)
-collection = chroma_client.get_or_create_collection(name="markdown_docs")
+collection = chroma_client.get_or_create_collection(name="markdown_docs_en")
 
 # Configurar cliente OpenAI
 client = openai.OpenAI(api_key=OPENAI_API_KEY)
@@ -66,56 +81,75 @@ def extract_response(full_response, prompt_marker):
     return full_response.strip()
 
 
-
-# Búsqueda interactiva por terminal
-def interactive_query():
-    user_query = input("Introdueix la teva pregunta: ")
-
-
-    # Generar embedding de la consulta con OpenAI
-    query_embedding = get_openai_embedding(user_query)
+def improve_user_prompt(user_prompt):
+    # Generate query embedding
+    query_embedding = get_openai_embedding(user_prompt)
     if not query_embedding:
-        return {"message": "Error generating embedding for query."}
+        print("Error generating embedding for query.")
+        return
 
-    # Buscar en ChromaDB
+    # Query ChromaDB
     results = collection.query(
         query_embeddings=query_embedding,
-        n_results=5
+        n_results=6
+    )
+
+    info = ""
+    for idx, metadata in enumerate(results["metadatas"][0]):
+        sentence = results["metadatas"][0][idx]['sentence']
+        info += f"- {sentence}\n"
+
+    prompt = PROMPT_IMPROVEMENT.format(user_query=user_prompt, current_embeddings=info)
+
+    client = genai.Client(api_key=GEMINI_API_KEY)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash", contents=prompt
+    )
+    return response.text
+
+
+# Interactive search
+def interactive_query():
+    user_query = input("Enter your question (in English): ")
+
+    # Improve user query using LLM
+    improved_query = improve_user_prompt(user_query)
+
+    # Generate query embedding
+    query_embedding = get_openai_embedding(improved_query)
+    if not query_embedding:
+        print("Error generating embedding for query.")
+        return
+
+    # Query ChromaDB
+    results = collection.query(
+        query_embeddings=query_embedding,
+        n_results=6
     )
 
     if not results["ids"] or not results["ids"][0]:
-        print("No s'ha trobat contingut relevant.")
+        print("No relevant info found.")
         return
 
-    # Construir el prompt para el LLM
+    # Build context information
     info = ""
     for idx, metadata in enumerate(results["metadatas"][0]):
-        sentence = metadata = results["metadatas"][0][idx]['sentence']
-        info += f"- {sentence})\n"
+        sentence = results["metadatas"][0][idx]['sentence']
+        info += f"- {sentence}\n"
 
-    prompt = f"""Respon de manera breu, directa i exclusivament en català a la pregunta següent, basant-te en la informació proporcionada:
+    # Build LLM prompt
+    prompt = LLM_PROMPT_TEMPLATE.format(user_query=improved_query, info=info)
+    prompt_marker = "Short answer in English:"
 
-    Pregunta: '{user_query}'
+    client = genai.Client(api_key=GEMINI_API_KEY)
+    response = client.models.generate_content(
+        model="gemini-2.0-flash", contents=prompt
+    )
 
-    Informació proporcionada:
-    '{info}'
-    """
+    clean_response = extract_response(response.text, prompt_marker)
+    print("\nAnswer from LLM:\n")
+    print(response.text)
 
-    prompt_marker = "Resposta curta en català:"
-
-    prompt += prompt_marker
-
-    # Enviar prompt al modelo de Hugging Face para obtener respuesta inmediata
-    llm_response = requests.post(HUGGINGFACE_MODEL_URL, headers=headers, json={"inputs": prompt})
-
-    if llm_response.status_code == 200:
-        response_json = llm_response.json()
-        resposta_completa = response_json[0]['generated_text']
-        resposta_net = extract_response(resposta_completa, prompt_marker)
-        print("\nResposta del model LLM:\n")
-        print(resposta_net)
-    else:
-        print("Error al obtener resposta del model LLM.")
 
 if __name__ == "__main__":
     while True:

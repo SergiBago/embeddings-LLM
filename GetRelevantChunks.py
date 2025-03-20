@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from fastapi import FastAPI, Query
 
 # Configuración
-DATA_FOLDER = "./markdown_files/fib_markdown"
+DATA_FOLDER = "./markdown_files/fib_markdown_cat"
 CHROMA_DB_FOLDER = "chromadb_store"
 OPENAI_MODEL = "text-embedding-3-small"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -96,7 +96,7 @@ def search(query: str = Query(..., title="Search query")):
         best_match = results["metadatas"][0][0]
         return {
             "filename": best_match["filename"],
-            "url": f"{BASE_URL}{best_match['filename'].replace('fib_markdown','').replace(os.sep, '/').replace('//','/').replace('.md','')}",
+            "url": f"{BASE_URL}{best_match['filename'].replace('fib_markdown_cat','').replace(os.sep, '/').replace('//','/').replace('.md','')}",
             "sentence": best_match["sentence"],
             "sentence_index": best_match["sentence_index"]
         }
