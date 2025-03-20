@@ -16,7 +16,7 @@ PROMPT_IMPROVEMENT = config["prompt_improvement"]
 LLM_PROMPT_TEMPLATE = config["llm_prompt_template"]
 
 # Configuración
-CHROMA_DB_FOLDER = "chromadb_store"
+CHROMA_DB_FOLDER = "chromadb_store_en"
 OPENAI_MODEL = "text-embedding-3-small"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
@@ -40,7 +40,7 @@ if not GEMINI_API_KEY:
 
 # Inicializar ChromaDB
 chroma_client = chromadb.PersistentClient(path=CHROMA_DB_FOLDER)
-collection = chroma_client.get_or_create_collection(name="markdown_docs_en")
+collection = chroma_client.get_or_create_collection(name="markdown_docs")
 
 # Configurar cliente OpenAI
 client = openai.OpenAI(api_key=OPENAI_API_KEY)

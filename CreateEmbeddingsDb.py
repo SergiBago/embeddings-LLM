@@ -8,7 +8,7 @@ from fastapi import FastAPI, Query
 
 # Configuración
 DATA_FOLDER = "./markdown_files/fib_markdown"
-CHROMA_DB_FOLDER = "chromadb_store"
+CHROMA_DB_FOLDER = "chromadb_store_en"
 OPENAI_MODEL = "text-embedding-3-small"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 MAX_CALLS = 1000000
@@ -21,7 +21,7 @@ if not OPENAI_API_KEY:
 
 # Inicializar ChromaDB
 chroma_client = chromadb.PersistentClient(path=CHROMA_DB_FOLDER)
-collection = chroma_client.get_or_create_collection(name="markdown_docs_en")
+collection = chroma_client.get_or_create_collection(name="markdown_docs")
 
 # Configurar cliente OpenAI
 client = openai.OpenAI(api_key=OPENAI_API_KEY)
@@ -111,7 +111,13 @@ def process_markdown_files():
                                 }]
                             )
 
+                # Eliminar el archivo después de procesarlo
+                try:
+                    os.remove(filepath)
+                    print(f"Deleted file: {filename}")
+                except Exception as e:
+                    print(f"Error deleting file {filename}: {e}")
 
 # Cargar los documentos si no están indexados aún
-if len(collection.get()['ids']) == 0:
-    process_markdown_files()
+#if len(collection.get()['ids']) == 0:
+process_markdown_files()
