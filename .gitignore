@@ -2,3 +2,4 @@ venv/
 fib_markdown/
 .idea/
 chromadb_store/
+.env
