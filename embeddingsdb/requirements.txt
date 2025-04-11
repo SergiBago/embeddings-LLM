@@ -1,0 +1,4 @@
+chromadb
+openai
+markdown
+beautifulsoup4
