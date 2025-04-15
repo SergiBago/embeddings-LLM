@@ -9,6 +9,13 @@
 <body>
   <div class="container">
     <h1>FIB Agent</h1>
+
+   <!-- Website scraping form -->
+    <div id="scraper-form" style="margin-bottom: 20px;">
+      <input type="text" id="scrape-url" placeholder="Enter website URL..." required />
+      <button onclick="scrapeWebsite()">Scrape</button>
+    </div>
+
     <div class="chat-box" id="chat-box"></div>
     <div id="query-form">
       <input type="text" id="user-input" placeholder="Ask me anything..." required />

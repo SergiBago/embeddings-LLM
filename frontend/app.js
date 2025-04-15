@@ -43,3 +43,28 @@ async function sendQuery() {
   // Scroll again in case message overflows
   chatBox.scrollTop = chatBox.scrollHeight;
 }
+
+
+function scrapeWebsite() {
+    const url = document.getElementById('scrape-url').value.trim();
+    if (!url) {
+      alert("Please enter a valid URL.");
+      return;
+    }
+
+    fetch(`/downloadWebsite?website=${encodeURIComponent(url)}`, {
+      method: 'POST'
+    })
+    .then(response => {
+      if (!response.ok) throw new Error("Server error");
+      return response.text(); // or .json() if you're returning JSON
+    })
+    .then(data => {
+      alert("Scraping complete.");
+      console.log(data);
+    })
+    .catch(error => {
+      console.error('Error during scraping:', error);
+      alert("An error occurred during scraping.");
+    });
+  }

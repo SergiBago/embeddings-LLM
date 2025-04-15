@@ -6,3 +6,7 @@ markdown~=3.7
 fastapi~=0.115.11
 bs4~=0.0.2
 requests~=2.32.3
+docling
+openai
+tiktoken
+markdownify
