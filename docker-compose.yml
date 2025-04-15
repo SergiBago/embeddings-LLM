@@ -1,11 +1,37 @@
 services:
-  chatbot:
-    build: .
-    ports: 
-      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+    networks:
+      - app-network
+
+  scraper:
+    build:
+      context: ./scraper
+    volumes:
+      - ./web_markdowns:/app/web_markdowns
+    ports:
+      - "5001:5001"
+    networks:
+      - app-network
+
+  embeddingsdb:
+    build:
+      context: ./embeddingsdb
+    depends_on:
+      - scraper
+    volumes:
+      - ./web_markdowns:/app/web_markdowns
+    ports:
+      - "8000:8000"
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-    volumes:
-      - ./chromadb_store:/app/chromadb_store
-      - ./chromadb_store_en:/app/chromadb_store_en
+    restart: "no"
+
+networks:
+  app-network:
+    driver: bridge
