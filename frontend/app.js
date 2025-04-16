@@ -5,6 +5,50 @@ document.getElementById("user-input").addEventListener("keypress", function (e) 
   }
 });
 
+document.getElementById("url-input").addEventListener("keypress", function (e) {
+  if (e.key === "Enter") {
+    processUrl();
+  }
+});
+
+async function processUrl() {
+  const url = document.getElementById("url-input").value.trim();
+  const chatBox = document.getElementById("chat-box");
+
+  if (!url) return;
+
+  const agentMessage = document.createElement("div");
+  agentMessage.className = "chat-message agent";
+  agentMessage.innerHTML = 'Procesando la URL, por favor espera... <span class="spinner"></span>';
+  chatBox.appendChild(agentMessage);
+
+  try {
+    const response = await fetch("http://localhost:5001/scrape", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ url: url })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      agentMessage.innerHTML = "¡Contenido procesado correctamente! Ya puedes empezar a preguntar.";
+      document.getElementById("chat-container").style.display = "block";
+      document.getElementById("url-form").style.display = "none";
+    } else {
+      agentMessage.innerHTML = "Error al procesar la URL: " + data.error;
+    }
+  } catch (error) {
+    agentMessage.innerHTML = "Error al conectar con el servidor.";
+    console.error(error);
+  }
+
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+
 async function sendQuery() {
   const inputEl = document.getElementById("user-input");
   const input = inputEl.value.trim();

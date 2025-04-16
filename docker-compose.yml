@@ -6,6 +6,3 @@ services:
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
-    volumes:
-      - ./chromadb_store:/app/chromadb_store
-      - ./chromadb_store_en:/app/chromadb_store_en

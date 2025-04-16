@@ -3,3 +3,5 @@ fib_markdown/
 .idea/
 chromadb_store/
 .env
+web_markdowns/
+__pycache__/
