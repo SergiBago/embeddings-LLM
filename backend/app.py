@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory, Response
 from LargeLanguageModel import *
 from scraper import scrape_site
+from extractWebInfo.extractWebInfo import extractWebInfo
 import os
 from flask_cors import CORS
 
@@ -36,6 +37,13 @@ def query():
 
     res = handle_query(user_query)
     return res
+
+@app.route("/downloadWebsite", methods=["GET", "POST"])
+def downloadWebsite():
+     website = request.args.get("website", "")
+     extractWebInfo(website)
+
+extractWebInfo("https://www.upc.edu/en")
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=8080)
