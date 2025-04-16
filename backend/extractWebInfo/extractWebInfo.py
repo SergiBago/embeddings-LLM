@@ -13,3 +13,5 @@ def extractWebInfo(url):
     os.makedirs(folder, exist_ok=True)
     downloadWebsite(url, folder)
     process_folder_files(folder)
+
+    return "Scraping complete"

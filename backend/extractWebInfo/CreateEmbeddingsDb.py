@@ -8,21 +8,21 @@ from docling.document_converter import DocumentConverter
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 # Configuración
-DATA_FOLDER = "./markdown_files/fib_markdown"
+DATA_FOLDER = "markdown"
 CHROMA_DB_FOLDER = "chromadb_store_en"
 OPENAI_MODEL = "text-embedding-3-small"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 MAX_CALLS = 1000000
 MAX_TOKENS = 16000  # Límite seguro para evitar el error de 8192 tokens
 call_count = 0
-BASE_URL = "https://fib.upc.edu/"
+BASE_URL = ""
 
 if not OPENAI_API_KEY:
     raise ValueError("No OpenAI API key found. Set the OPENAI_API_KEY environment variable.")
 
 # Inicializar ChromaDB
 chroma_client = chromadb.PersistentClient(path=CHROMA_DB_FOLDER)
-collection = chroma_client.get_or_create_collection(name="markdown_docs")
+collection = chroma_client.get_or_create_collection(name="markdowns")
 
 # Configurar cliente OpenAI
 client = openai.OpenAI(api_key=OPENAI_API_KEY)
@@ -69,45 +69,7 @@ def get_openai_embedding(text):
     except openai.BadRequestError as e:
         print(f"Error en OpenAI API: {e}")
         return None
-
-def get_openai_embedding(texts):
-    global call_count
-    if call_count >= MAX_CALLS:
-        raise RuntimeError("Límite de llamadas a OpenAI alcanzado")
-
-    if isinstance(texts, str):
-        texts = [texts]
-
-    all_embeddings = []
-
-    try:
-        for text in texts:
-            text_chunks = split_large_text(text)
-
-            # Para cada chunk del texto largo, obtén embeddings y combínalos (ej. promedio)
-            chunk_embeddings = []
-            for chunk in text_chunks:
-                response = client.embeddings.create(
-                    input=[chunk],
-                    model=OPENAI_MODEL
-                )
-                call_count += 1
-                chunk_embeddings.append(response.data[0].embedding)
-
-            # Si el texto original se partió en varios chunks, combínalos en uno solo (media)
-            if len(chunk_embeddings) > 1:
-                import numpy as np
-                avg_embedding = list(np.mean(chunk_embeddings, axis=0))
-                all_embeddings.append(avg_embedding)
-            else:
-                all_embeddings.append(chunk_embeddings[0])
-
-        return all_embeddings
-
-    except openai.BadRequestError as e:
-        print(f"Error en OpenAI API: {e}")
-        return None
-
+    
 
 # Función para dividir el texto en frases
 def split_into_sentences(text):
@@ -132,21 +94,20 @@ def process_markdown_file(root, filename):
 
     # Generar embeddings con OpenAI y guardarlos en ChromaDB
     relative_path = os.path.relpath(filepath, DATA_FOLDER)
-
-    embeddings = get_openai_embedding(sentences)
-
-    if embeddings:
-        for idx, (sentence, embedding) in enumerate(zip(sentences, embeddings)):
-            sentence_id = f"{relative_path}_sentence{idx}_part0"
-            collection.add(
-                ids=[sentence_id],
-                embeddings=[embedding],
-                metadatas=[{
-                    "filename": relative_path,
-                    "sentence": sentence,
-                    "sentence_index": idx
-                }]
-            )
+    for idx, sentence in enumerate(sentences):
+        embeddings = get_openai_embedding(sentence)
+        if embeddings:
+            for part_idx, embedding in enumerate(embeddings):
+                sentence_id = f"{relative_path}_sentence{idx}_part{part_idx}"
+                collection.add(
+                    ids=[sentence_id],
+                    embeddings=[embedding],
+                    metadatas=[{
+                        "filename": relative_path,
+                        "sentence": sentence,
+                        "sentence_index": idx
+                    }]
+                )   
 
 
     # Eliminar el archivo después de procesarlo
@@ -206,11 +167,3 @@ def process_folder_files(base_folder):
                 process_pdf_file(root, filename)
             elif filename.endswith(".md"):
                 process_markdown_file(root, filename)
-
-
-
-#process_files()
-
-# Cargar los documentos si no están indexados aún
-#if len(collection.get()['ids']) == 0:
-#process_markdown_files()

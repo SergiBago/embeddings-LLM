@@ -26,7 +26,7 @@ async function processUrl() {
   await new Promise(resolve => setTimeout(resolve, 50));
 
   try {
-    const response = await fetch("http://localhost:8080/scrape", {
+    const response = await fetch("http://localhost:8080/downloadWebsite", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -92,28 +92,3 @@ async function sendQuery() {
 
   chatBox.scrollTop = chatBox.scrollHeight;
 }
-
-
-function scrapeWebsite() {
-    const url = document.getElementById('scrape-url').value.trim();
-    if (!url) {
-      alert("Please enter a valid URL.");
-      return;
-    }
-
-    fetch(`/downloadWebsite?website=${encodeURIComponent(url)}`, {
-      method: 'POST'
-    })
-    .then(response => {
-      if (!response.ok) throw new Error("Server error");
-      return response.text(); // or .json() if you're returning JSON
-    })
-    .then(data => {
-      alert("Scraping complete.");
-      console.log(data);
-    })
-    .catch(error => {
-      console.error('Error during scraping:', error);
-      alert("An error occurred during scraping.");
-    });
-  }
