@@ -5,3 +5,4 @@ chromadb_store/
 .env
 web_markdowns/
 __pycache__/
+.vscode/

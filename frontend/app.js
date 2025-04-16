@@ -1,7 +1,6 @@
-
 document.getElementById("user-input").addEventListener("keypress", function (e) {
-  if(e.key==="Enter"){
-    sendQuery()
+  if (e.key === "Enter") {
+    sendQuery();
   }
 });
 
@@ -13,17 +12,21 @@ document.getElementById("url-input").addEventListener("keypress", function (e) {
 
 async function processUrl() {
   const url = document.getElementById("url-input").value.trim();
-  const chatBox = document.getElementById("chat-box");
+  const url_form = document.getElementById("url-form");
+  const spinner = document.getElementById("spinner");
 
   if (!url) return;
 
-  const agentMessage = document.createElement("div");
-  agentMessage.className = "chat-message agent";
-  agentMessage.innerHTML = 'Procesando la URL, por favor espera... <span class="spinner"></span>';
-  chatBox.appendChild(agentMessage);
+  url_form.style.display = "none";
+
+  // Mostrar mensaje con spinner
+  spinner.style.display = "block";
+
+  // Forzar repintado para mostrar spinner antes del fetch
+  await new Promise(resolve => setTimeout(resolve, 50));
 
   try {
-    const response = await fetch("http://localhost:5001/scrape", {
+    const response = await fetch("http://localhost:8080/scrape", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -31,21 +34,19 @@ async function processUrl() {
       body: JSON.stringify({ url: url })
     });
 
-    const data = await response.json();
+    const data = await response.text(); // <-- tu backend devuelve texto plano
 
     if (response.ok) {
-      agentMessage.innerHTML = "¡Contenido procesado correctamente! Ya puedes empezar a preguntar.";
+      spinner.style.display = "none";
       document.getElementById("chat-container").style.display = "block";
-      document.getElementById("url-form").style.display = "none";
     } else {
-      agentMessage.innerHTML = "Error al procesar la URL: " + data.error;
+      agentMessage.innerHTML = "❌ Error al procesar la URL: " + data;
     }
   } catch (error) {
-    agentMessage.innerHTML = "Error al conectar con el servidor.";
+    agentMessage.innerHTML = "❌ Error al conectar con el servidor.";
     console.error(error);
   }
 
-  chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 
@@ -56,34 +57,38 @@ async function sendQuery() {
 
   if (!input) return;
 
-  // Add user message
+  // Mostrar mensaje del usuario
   const userMessage = document.createElement("div");
   userMessage.className = "chat-message user";
   userMessage.textContent = `${input}`;
   chatBox.appendChild(userMessage);
 
-  // Add agent placeholder
+  // Mensaje de espera de la IA
   const agentMessage = document.createElement("div");
   agentMessage.className = "chat-message agent";
-  agentMessage.textContent = "Thinking...";
+  agentMessage.textContent = "Pensando...";
   chatBox.appendChild(agentMessage);
 
-  // Scroll to bottom
   chatBox.scrollTop = chatBox.scrollHeight;
-
   inputEl.value = "";
 
   try {
-    const url = `${window.location.origin}/query?query=${encodeURIComponent(input)}`;
-    const response = await fetch(url);
+    const response = await fetch("http://localhost:8080/query", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ query: input })
+    });
+    // const url = `${window.location.origin}/query?query=${encodeURIComponent(input)}`;
+    // const response = await fetch(url);
     const data = await response.text();
 
     agentMessage.textContent = `${data}`;
   } catch (error) {
-    agentMessage.textContent = "Error - Could not reach the server.";
+    agentMessage.textContent = "Error - No se pudo conectar con el servidor.";
     console.error(error);
   }
 
-  // Scroll again in case message overflows
   chatBox.scrollTop = chatBox.scrollHeight;
 }
