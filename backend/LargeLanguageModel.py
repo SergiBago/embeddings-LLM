@@ -30,7 +30,7 @@ if not OPENAI_API_KEY or not GEMINI_API_KEY:
     raise ValueError("Missing API keys. Check your environment variables.")
 
 chroma_client = chromadb.PersistentClient(path=CHROMA_DB_FOLDER)
-collection = chroma_client.get_or_create_collection(name="markdown_docs")
+collection = chroma_client.get_or_create_collection(name="memory")
 openai_client = openai.OpenAI(api_key=OPENAI_API_KEY)
 genai_client = genai.Client(api_key=GEMINI_API_KEY)
 
