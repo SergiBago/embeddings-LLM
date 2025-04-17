@@ -12,3 +12,5 @@ tiktoken
 markdownify
 flask~=3.1.0
 google-genai~=1.10.0
+markdownify
+flask-cors

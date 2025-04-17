@@ -5,27 +5,38 @@ import re
 import openai
 from bs4 import BeautifulSoup
 from docling.document_converter import DocumentConverter
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 # Configuración
-DATA_FOLDER = "./markdown_files/fib_markdown"
+DATA_FOLDER = "markdown"
 CHROMA_DB_FOLDER = "chromadb_store_en"
 OPENAI_MODEL = "text-embedding-3-small"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 MAX_CALLS = 1000000
 MAX_TOKENS = 16000  # Límite seguro para evitar el error de 8192 tokens
 call_count = 0
-BASE_URL = "https://fib.upc.edu/"
+BASE_URL = ""
 
 if not OPENAI_API_KEY:
     raise ValueError("No OpenAI API key found. Set the OPENAI_API_KEY environment variable.")
 
 # Inicializar ChromaDB
 chroma_client = chromadb.PersistentClient(path=CHROMA_DB_FOLDER)
-collection = chroma_client.get_or_create_collection(name="markdown_docs")
+collection = chroma_client.get_or_create_collection(name="memory")
 
 # Configurar cliente OpenAI
 client = openai.OpenAI(api_key=OPENAI_API_KEY)
+
+def remove_empty_dirs(path):
+    """Elimina recursivamente las carpetas vacías."""
+    for root, dirs, _ in os.walk(path, topdown=False):
+        for d in dirs:
+            dir_path = os.path.join(root, d)
+            if not os.listdir(dir_path):  # si está vacía
+                try:
+                    os.rmdir(dir_path)
+                    print(f"🗑️ Removed empty folder: {dir_path}")
+                except Exception as e:
+                    print(f"❌ Error deleting folder {dir_path}: {e}")
 
 # Función para limpiar HTML
 def clean_html(text):
@@ -69,8 +80,9 @@ def get_openai_embedding(text):
     except openai.BadRequestError as e:
         print(f"Error en OpenAI API: {e}")
         return None
+    
 
-def get_openai_embedding(texts):
+def get_openai_embedding_pdfs(texts):
     global call_count
     if call_count >= MAX_CALLS:
         raise RuntimeError("Límite de llamadas a OpenAI alcanzado")
@@ -107,7 +119,7 @@ def get_openai_embedding(texts):
     except openai.BadRequestError as e:
         print(f"Error en OpenAI API: {e}")
         return None
-
+    
 
 # Función para dividir el texto en frases
 def split_into_sentences(text):
@@ -132,22 +144,22 @@ def process_markdown_file(root, filename):
 
     # Generar embeddings con OpenAI y guardarlos en ChromaDB
     relative_path = os.path.relpath(filepath, DATA_FOLDER)
-
-    embeddings = get_openai_embedding(sentences)
-
-    if embeddings:
-        for idx, (sentence, embedding) in enumerate(zip(sentences, embeddings)):
-            sentence_id = f"{relative_path}_sentence{idx}_part0"
-            collection.add(
-                ids=[sentence_id],
-                embeddings=[embedding],
-                metadatas=[{
-                    "filename": relative_path,
-                    "sentence": sentence,
-                    "sentence_index": idx
-                }]
-            )
-
+    for idx, sentence in enumerate(sentences):
+        embeddings = get_openai_embedding(sentence)
+        if embeddings:
+            for part_idx, embedding in enumerate(embeddings):
+                sentence_id = f"{relative_path}_sentence{idx}_part{part_idx}"
+                existing = collection.get(ids=[sentence_id])
+                if not existing["ids"]:  # si el ID no existe, lo añadimos
+                    collection.add(
+                        ids=[sentence_id],
+                        embeddings=[embedding],
+                        metadatas=[{
+                            "filename": relative_path,
+                            "sentence": sentence,
+                            "sentence_index": idx
+                        }]
+                    )
 
     # Eliminar el archivo después de procesarlo
     try:
@@ -155,6 +167,7 @@ def process_markdown_file(root, filename):
         print(f"Deleted file: {filename}")
     except Exception as e:
         print(f"Error deleting file {filename}: {e}")
+
 
 def process_pdf_file(root, filename):
     print("processing PDF file: " + filename)
@@ -175,20 +188,22 @@ def process_pdf_file(root, filename):
         # Generar embeddings con OpenAI y guardarlos en ChromaDB
         relative_path = os.path.relpath(filepath, DATA_FOLDER)
 
-        embeddings = get_openai_embedding(sentences)
+        embeddings = get_openai_embedding_pdfs(sentences)
 
         if embeddings:
             for idx, (sentence, embedding) in enumerate(zip(sentences, embeddings)):
                 sentence_id = f"{relative_path}_sentence{idx}_part0"
-                collection.add(
-                    ids=[sentence_id],
-                    embeddings=[embedding],
-                    metadatas=[{
-                        "filename": relative_path,
-                        "sentence": sentence,
-                        "sentence_index": idx
-                    }]
-                )
+                existing = collection.get(ids=[sentence_id])
+                if not existing["ids"]:  # si el ID no existe, lo añadimos
+                    collection.add(
+                        ids=[sentence_id],
+                        embeddings=[embedding],
+                        metadatas=[{
+                            "filename": relative_path,
+                            "sentence": sentence,
+                            "sentence_index": idx
+                        }]
+                    )
 
         # Eliminar el archivo después de procesarlo
         os.remove(filepath)
@@ -197,20 +212,13 @@ def process_pdf_file(root, filename):
     except Exception as e:
         print(f"Error processing PDF {filename}: {e}")
 
+
 def process_folder_files(base_folder):
     DATA_FOLDER = base_folder
     for root, _, files in os.walk(DATA_FOLDER):
         for filename in files:
             if(filename.endswith(".pdf")):
-                continue
                 process_pdf_file(root, filename)
             elif filename.endswith(".md"):
                 process_markdown_file(root, filename)
-
-
-
-#process_files()
-
-# Cargar los documentos si no están indexados aún
-#if len(collection.get()['ids']) == 0:
-#process_markdown_files()
+    remove_empty_dirs(DATA_FOLDER)
