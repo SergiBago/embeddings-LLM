@@ -94,7 +94,7 @@ def handle_query(query:str):
     query_embedding = get_openai_embedding(improved_query)
     if not query_embedding:
         print("Error generating embedding for query.")
-        return
+        return "Error generating embedding for query."
 
     # Query ChromaDB
     results = collection.query(
@@ -104,7 +104,7 @@ def handle_query(query:str):
 
     if not results["ids"] or not results["ids"][0]:
         print("No relevant info found.")
-        return
+        return "No relevant information found."
 
     # Build context information
     info = ""

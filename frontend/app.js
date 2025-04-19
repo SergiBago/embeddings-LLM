@@ -45,19 +45,26 @@ async function checkProgress(taskId) {
       loadMessage.innerText = text
       document.getElementById("chat-container").style.display = "grid";
       loadMessage.classList.remove('loading')
-
+      document.getElementById("url-input").value = "";
     } else if (status === "error") {
       loadMessage.innerText = `❌ Error: ${text}`;
       loadMessage.classList.remove('loading')
       document.getElementById("chat-container").style.display = "grid";
     } else {
-      // Seguir comprobando cada 2 segundos
-      loadMessage.innerText = text
-      loadMessage.scrollTo({
+        // Guardar si estaba abajo antes de cambiar el texto
+      const wasAtBottom = loadMessage.scrollTop + loadMessage.clientHeight >= loadMessage.scrollHeight - 5;
+
+      // Actualizar el texto
+      loadMessage.innerText = text;
+
+      // Hacer scroll solo si estaba abajo antes
+      if (wasAtBottom) {
+        loadMessage.scrollTo({
           top: loadMessage.scrollHeight,
           behavior: "smooth"
         });
-      setTimeout(() => checkProgress(taskId), 200);
+      }
+      setTimeout(() => checkProgress(taskId), 500);
     }
   } catch (err) {
     console.error(err);
@@ -98,8 +105,7 @@ async function sendQuery() {
       },
       body: JSON.stringify({ query: input })
     });
-    // const url = `${window.location.origin}/query?query=${encodeURIComponent(input)}`;
-    // const response = await fetch(url);
+
     const data = await response.text();
 
     const formattedData = data
