@@ -3,12 +3,19 @@ from bs4 import BeautifulSoup
 import markdownify
 import os
 from urllib.parse import urljoin, urlparse
+import json
+
+# Configuration paths
+CONFIG_FILE = "data/config/config.json"
+# Load configurations
+with open(CONFIG_FILE, 'r', encoding='utf-8') as config_file:
+    config = json.load(config_file)
 
 # Define language prefixes to ignore (ignores base language pages but keeps subpages)
-LANG_PREFIXES = ["/ca", "/es"]
+LANG_PREFIXES =  config["ignore_langs"]
 
 #Ignorar elements que no es puguin convertir a markdown
-IGNORE_TYPES = [".rss", ".py"]
+IGNORE_TYPES = config["ignore_types"]
 
 # Folder to store Markdown files
 SAVE_FOLDER = ""
@@ -19,11 +26,9 @@ visited_urls = set()
 
 pending_urls=[]
 
-MAX_FILES = os.getenv("MAX_FILES")
+MAX_FILES =  config["max_files"]
 if(MAX_FILES == None):
-    MAX_FILES = 10000
-else:
-    MAX_FILES = int(MAX_FILES)
+    MAX_FILES = 500
 
 def url_to_filepath(url, is_pdf=False):
     """
@@ -56,7 +61,8 @@ def should_ignore_url(url):
 
     """Check if the URL is just a language version of the main page."""
     for prefix in LANG_PREFIXES:
-        if url.endswith(prefix) or prefix+"/" in url:
+        pre = "/" + prefix
+        if url.endswith(pre) or pre+"/" in url:
             return True
     return False
 

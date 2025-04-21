@@ -75,6 +75,11 @@ h1 {
     max-width: 80%;
     word-wrap: break-word;
     font-weight: 400;
+    color: #333;
+}
+
+.chat-message * {
+    color: #333;
 }
 
 .user {
@@ -186,7 +191,6 @@ h3 {
     max-height: 50vh;
 }
 
-/* Scrollbar track (background) */
 ::-webkit-scrollbar-track {
   background: transparent;
 }
@@ -194,4 +198,9 @@ h3 {
 strong {
     color: #222!important;
     font-weight: 500!important;
+}
+
+#url-form.disabled{
+    pointer-events: none;
+    opacity: 0.5;
 }

@@ -7,11 +7,10 @@ from bs4 import BeautifulSoup
 from docling.document_converter import DocumentConverter
 
 # Configuración
-DATA_FOLDER = "markdown"
-CHROMA_DB_FOLDER = "chromadb_store_en"
+DATA_FOLDER = "data/markdown"
+CHROMA_DB_FOLDER = "data/chromadb_store_en"
 OPENAI_MODEL = "text-embedding-3-small"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-MAX_CALLS = 1000000
 MAX_CHARS = 16000
 call_count = 0
 BASE_URL = ""
@@ -61,9 +60,6 @@ def split_large_text(text, max_tokens=MAX_CHARS):
 # Función para obtener embeddings de OpenAI con manejo de errores
 def get_openai_embedding(text):
     global call_count
-    if call_count >= MAX_CALLS:
-        raise RuntimeError("Límite de llamadas a OpenAI alcanzado")
-
     try:
         text_chunks = split_large_text(text)
         embeddings = []
@@ -84,9 +80,6 @@ def get_openai_embedding(text):
 
 def get_openai_embedding_pdfs(texts):
     global call_count
-    if call_count >= MAX_CALLS:
-        raise RuntimeError("Límite de llamadas a OpenAI alcanzado")
-
     if isinstance(texts, str):
         texts = [texts]
 
@@ -148,7 +141,7 @@ def process_markdown_file(root, filename, url):
         embeddings = get_openai_embedding(sentence)
         if embeddings:
             for part_idx, embedding in enumerate(embeddings):
-                sentence_id = f"{relative_path}_sentence{idx}_part{part_idx}"
+                sentence_id = f"{file_url}_sentence{idx}_part{part_idx}"
                 existing = collection.get(ids=[sentence_id])
                 if not existing["ids"]:  # si el ID no existe, lo añadimos
                     collection.add(

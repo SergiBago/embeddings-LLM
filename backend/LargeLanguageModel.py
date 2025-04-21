@@ -6,9 +6,10 @@ from google import genai
 import re
 
 # Configuration paths
-CONFIG_FILE = "backend/data/config.json"
+CONFIG_FILE = "data/config/config.json"
 
-print(os.getcwd())
+# Historial de mensajes (lo gestionas tú desde fuera)
+chat_history = []
 
 # Load configurations
 with open(CONFIG_FILE, 'r', encoding='utf-8') as config_file:
@@ -17,7 +18,7 @@ with open(CONFIG_FILE, 'r', encoding='utf-8') as config_file:
 PROMPT_IMPROVEMENT = config["prompt_improvement"]
 LLM_PROMPT_TEMPLATE = config["llm_prompt_template"]
 
-CHROMA_DB_FOLDER = "chromadb_store_en"
+CHROMA_DB_FOLDER = "data/chromadb_store_en"
 OPENAI_MODEL = "text-embedding-3-small"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -25,6 +26,11 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 MAX_CALLS = 100000
 MAX_TOKENS = 16000
 call_count = 0
+
+MAX_CHAT_HISTORY =  config["max_chat_history"]
+if MAX_CHAT_HISTORY == None:
+    MAX_CHAT_HISTORY = 6
+
 
 if not OPENAI_API_KEY or not GEMINI_API_KEY:
     raise ValueError("Missing API keys. Check your environment variables.")
@@ -35,7 +41,7 @@ openai_client = openai.OpenAI(api_key=OPENAI_API_KEY)
 genai_client = genai.Client(api_key=GEMINI_API_KEY)
 
 # Cargar el diccionario desde el JSON
-with open('backend/data/dictionary.json', 'r', encoding='utf-8') as f:
+with open('data/config/dictionary.json', 'r', encoding='utf-8') as f:
     dictionary = json.load(f)
 
 
@@ -60,7 +66,17 @@ def get_openai_embedding(text):
 
     return embeddings[0]
 
-def improve_user_prompt(user_prompt):
+def call_openai(prompt: str) -> str:
+    response = openai_client.chat.completions.create(
+        model="gpt-4o-mini-2024-07-18",
+        messages=[
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.7
+    )
+    return response.choices[0].message.content
+
+def improve_user_prompt_old(user_prompt):
     # Extract words robustly
     palabras = re.split(r'[,\s.!?¿¡;:\(\)\[\]\{\}]+', user_prompt)
 
@@ -84,7 +100,7 @@ def improve_user_prompt(user_prompt):
 
     # Get semantic embedding results
     query_embedding = get_openai_embedding(user_prompt)
-    results = collection.query(query_embeddings=query_embedding, n_results=6)
+    results = collection.query(query_embeddings=query_embedding, n_results=10)
     info = "".join([f"- {meta['sentence']}\n" for meta in results["metadatas"][0]])
 
     # Format final prompt
@@ -94,17 +110,62 @@ def improve_user_prompt(user_prompt):
         current_embeddings=info
     )
 
-    # Call LLM
-    response = genai_client.models.generate_content(
-        model="gemini-2.0-flash", contents=prompt
+    return call_openai(prompt)
+
+    ## Call LLM
+    #response = genai_client.models.generate_content(
+    #    model="gemini-2.0-flash", contents=prompt
+    #)
+    #return response.text
+
+def improve_user_prompt(user_prompt, chat_history_local):
+    # Asegurarse de que solo se usan los últimos 5 mensajes
+    last_turns = chat_history_local[-8:]
+    formatted_history = ""
+    for turn in last_turns:
+        formatted_history += f"{turn['role'].capitalize()}: {turn['content']}\n"
+
+    # Extraer términos útiles del diccionario
+    palabras = re.split(r'[,\s.!?¿¡;:\(\)\[\]\{\}]+', user_prompt)
+    contexto_items = []
+    for palabra in palabras:
+        if palabra in dictionary:
+            entry = dictionary[palabra]
+            details = [f"**{palabra}**"]
+            if 'es' in entry:
+                details.append(f"es: {entry['es']}")
+            if 'en' in entry:
+                details.append(f"en: {entry['en']}")
+            if 'description' in entry:
+                details.append(f"desc: {entry['description']}")
+            if 'type' in entry:
+                details.append(f"type: {entry['type']}")
+            contexto_items.append(" | ".join(details))
+
+    contexto = "\n".join(contexto_items)
+
+    # Obtener embeddings para esta consulta
+    query_embedding = get_openai_embedding(user_prompt)
+    results = collection.query(query_embeddings=query_embedding, n_results=6)
+    info = "".join([f"- {meta['sentence']}\n" for meta in results["metadatas"][0]])
+
+    # Construir el nuevo prompt con historial
+    full_prompt = PROMPT_IMPROVEMENT.format(
+        user_query=user_prompt,
+        chat_history=formatted_history,
+        dictionary=contexto,
+        current_embeddings=info
     )
-    return response.text
+
+    improved_prompt = call_openai(full_prompt)
+    return improved_prompt
+
 
 def extract_response(full_response, prompt_marker):
     return full_response.split(prompt_marker)[-1].strip() if prompt_marker in full_response else full_response.strip()
 
 # Interactive search
-def handle_query(query:str):
+def handle_query_old(query:str):
 
     # Improve user query using LLM
     improved_query = improve_user_prompt(query)
@@ -135,12 +196,46 @@ def handle_query(query:str):
     prompt = LLM_PROMPT_TEMPLATE.format(user_query=improved_query, info=info)
     prompt_marker = "Short answer in English:"
 
-    client = genai.Client(api_key=GEMINI_API_KEY)
-    response = client.models.generate_content(
-        model="gemini-2.0-flash", contents=prompt
-    )
+    response = call_openai(prompt)
 
-    clean_response = extract_response(response.text, prompt_marker)
+    #client = genai.Client(api_key=GEMINI_API_KEY)
+    #response = client.models.generate_content(
+    #    model="gemini-2.0-flash", contents=prompt
+    #)
+
+   # clean_response = extract_response(response.text, prompt_marker)
     print("\nAnswer from LLM:\n")
-    print(response.text)
-    return response.text
+    print(response)
+    return response
+
+def handle_query(query: str, chat_history:[]):
+
+    # Mejorar la consulta con historial
+    improved_query = improve_user_prompt(query, chat_history)
+
+    # Guardar prompt mejorado en historial antes de la respuesta
+    query_embedding = get_openai_embedding(improved_query)
+    if not query_embedding:
+        return "Error generating embedding for query."
+
+    results = collection.query(query_embeddings=query_embedding, n_results=12)
+    if not results["ids"] or not results["ids"][0]:
+        return "No relevant information found."
+
+    info = "\n".join(f"- {m['sentence']}" for m in results["metadatas"][0])
+
+    final_prompt = LLM_PROMPT_TEMPLATE.format(user_query=improved_query, info=info)
+    response = call_openai(final_prompt)
+
+    # Añadir consulta al historial
+    chat_history.append({"role": "user", "content": improved_query})
+
+    # Guardar respuesta también en el historial
+    chat_history.append({"role": "assistant", "content": response})
+
+    while(len(chat_history) > MAX_CHAT_HISTORY):
+        chat_history.pop(0)
+
+    print("\nAnswer from LLM:\n")
+    print(response)
+    return response

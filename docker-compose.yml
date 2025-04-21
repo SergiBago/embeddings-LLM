@@ -8,4 +8,4 @@ services:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - MAX_FILES=${MAX_FILES}
     volumes:
-      - ./.persistence:/app/chromadb_store_en
+      - ./docker_data:/app/data

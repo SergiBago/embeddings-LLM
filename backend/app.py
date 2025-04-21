@@ -1,12 +1,15 @@
-from flask import Flask, request, jsonify, send_from_directory, Response
+from flask import Flask, request, jsonify, send_from_directory, session
 from LargeLanguageModel import *
 from extractWebInfo.extractWebInfo import extractWebInfo
-import os
 from flask_cors import CORS
 import threading
 import uuid
+from collections import deque
 
 app = Flask(__name__, static_folder="../frontend", static_url_path="")
+app.secret_key = "clave_chatbot_dgsi_para_sesiones_456123789"
+
+
 
 progress_dict = {}
 
@@ -27,7 +30,16 @@ def query():
     if not user_query:
         return jsonify({"error": "No query provided"}), 400
 
-    res = handle_query(user_query)
+        # Inicializa historial si no existe
+    if "chat_history" not in session:
+        session["chat_history"] = []
+
+    history = session["chat_history"]
+    # Usa deque para comportamiento de cola
+
+    res = handle_query(user_query, history)
+
+    session["chat_history"] = history
     return res
 
 
@@ -58,6 +70,8 @@ def process_website_task(task_id, url):
         }
         extractWebInfo(url, task_id, progress_dict)
         progress_dict[task_id]['status'] = "done"
+        progress_dict[task_id]['text'] += f"\n✅ Finished scrapping {url}!"
+
     except Exception as e:
         progress_dict[task_id] = {"status":"error", "text":str(e)}
 
@@ -66,7 +80,11 @@ def get_progress(task_id):
     data = progress_dict.get(task_id)
     if data is None:
         return jsonify({"status": "not_found", "text": ""})
+
+    #If status is error or finished, remove from progresses
+    if data["status"] != "working":
+        progress_dict.pop(task_id)
     return jsonify(data)
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=8080)
+    app.run(debug=False, host='0.0.0.0', port=8090)
