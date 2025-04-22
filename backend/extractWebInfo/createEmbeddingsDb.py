@@ -5,6 +5,10 @@ import re
 import openai
 from bs4 import BeautifulSoup
 from docling.document_converter import DocumentConverter
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import threading
+
+lock = threading.Lock()  # Lock global para sincronizar acceso a progress_dict
 
 # Configuración
 DATA_FOLDER = "data/markdown"
@@ -124,44 +128,48 @@ def split_into_sentences(text):
 def process_markdown_file(root, filename, url):
     print("processing file: "+ filename)
     filepath = os.path.join(root, filename)
-    with open(filepath, "r", encoding="utf-8") as f:
-        content = f.read()
-
-    # Convertir Markdown a texto limpio
-    text = clean_html(markdown.markdown(content))
-
-    # Dividir el texto en frases
-    sentences = split_into_sentences(text)
-
-    # Generar embeddings con OpenAI y guardarlos en ChromaDB
-    relative_path = os.path.relpath(filepath, DATA_FOLDER)
-
-    file_url = getURL(filepath, root, url)
-    for idx, sentence in enumerate(sentences):
-        embeddings = get_openai_embedding(sentence)
-        if embeddings:
-            for part_idx, embedding in enumerate(embeddings):
-                sentence_id = f"{file_url}_sentence{idx}_part{part_idx}"
-                existing = collection.get(ids=[sentence_id])
-                if not existing["ids"]:  # si el ID no existe, lo añadimos
-                    collection.add(
-                        ids=[sentence_id],
-                        embeddings=[embedding],
-                        metadatas=[{
-                            "filename": file_url,
-                            "sentence": sentence,
-                            "sentence_index": idx
-                        }]
-                    )
-
-    # Eliminar el archivo después de procesarlo
     try:
-        os.remove(filepath)
-        print(f"Deleted file: {filename}")
-    except Exception as e:
-        print(f"Error deleting file {filename}: {e}")
+        with open(filepath, "r", encoding="utf-8") as f:
+            content = f.read()
 
-def getURL(filepath, root, url):
+        # Convertir Markdown a texto limpio
+        text = clean_html(markdown.markdown(content))
+
+        # Dividir el texto en frases
+        sentences = split_into_sentences(text)
+
+        # Generar embeddings con OpenAI y guardarlos en ChromaDB
+        relative_path = os.path.relpath(filepath, DATA_FOLDER)
+
+        file_url = get_url(filepath, root, url)
+        for idx, sentence in enumerate(sentences):
+            embeddings = get_openai_embedding(sentence)
+            if embeddings:
+                for part_idx, embedding in enumerate(embeddings):
+                    sentence_id = f"{file_url}_sentence{idx}_part{part_idx}"
+                    existing = collection.get(ids=[sentence_id])
+                    if not existing["ids"]:  # si el ID no existe, lo añadimos
+                        collection.add(
+                            ids=[sentence_id],
+                            embeddings=[embedding],
+                            metadatas=[{
+                                "filename": file_url,
+                                "sentence": sentence,
+                                "sentence_index": idx
+                            }]
+                        )
+
+        # Eliminar el archivo después de procesarlo
+        try:
+            os.remove(filepath)
+            print(f"Deleted file: {filename}")
+        except Exception as e:
+            print(f"Error deleting file {filename}: {e}")
+
+    except Exception as e:
+        print(f"Error processing file {filename}: {e}")
+
+def get_url(filepath, root, url):
     url = filepath.replace(root, url).replace("\\","/").replace("//","/").replace(":/","://").replace("_index.md","")
     if(url.endswith(".md")):
         url = url[:-3]
@@ -170,7 +178,7 @@ def getURL(filepath, root, url):
 def process_pdf_file(root, filename, url):
     print("processing PDF file: " + filename)
     filepath = os.path.join(root, filename)
-    file_url = getURL(filepath, root, url)
+    file_url = get_url(filepath, root, url)
 
     try:
         # Convertir PDF a Markdown usando Docling
@@ -211,19 +219,35 @@ def process_pdf_file(root, filename, url):
     except Exception as e:
         print(f"Error processing PDF {filename}: {e}")
 
+def process_file(root, filename, url, task_id, progress_dict):
+    this_task = f"Creating embeddings for {filename}..."
+    with lock:
+        progress_dict[task_id]['text'] += "\n" + this_task
+
+    if filename.endswith(".pdf"):
+        process_pdf_file(root, filename, url)
+    elif filename.endswith(".md"):
+        process_markdown_file(root, filename, url)
+
+    with lock:
+        progress_dict[task_id]['text'] = progress_dict[task_id]['text'].replace(
+            this_task,
+            f"✅ Created embeddings for {filename}"
+        )
 
 def process_folder_files(url, base_folder, task_id, progress_dict):
     DATA_FOLDER = base_folder
-    for root, _, files in os.walk(DATA_FOLDER):
-        for filename in files:
-            this_task = f"Creating embeddings for {filename}..."
-            progress_dict[task_id]['text'] += "\n" + this_task
-            if(filename.endswith(".pdf")):
-                process_pdf_file(root, filename, url)
-            elif filename.endswith(".md"):
-                process_markdown_file(root, filename, url)
-            progress_dict[task_id]['text'] = progress_dict[task_id]['text'].replace(
-                this_task,
-                f"✅ Created embeddings for {filename}"
-            )
+    futures = []
+
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        for root, _, files in os.walk(DATA_FOLDER):
+            for filename in files:
+                if filename.endswith(".pdf") or filename.endswith(".md"):
+                    futures.append(
+                        executor.submit(process_file, root, filename, url, task_id, progress_dict)
+                    )
+
+        for future in as_completed(futures):
+            future.result()  # raise any exceptions
+
     remove_empty_dirs(DATA_FOLDER)

@@ -1,5 +1,5 @@
 from .webToMarkdown import *
-from .CreateEmbeddingsDb import *
+from .createEmbeddingsDb import *
 import os
 
 SAVE_FOLDER = "data/markdown"

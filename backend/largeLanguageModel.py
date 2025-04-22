@@ -2,7 +2,6 @@ import os
 import chromadb
 import openai
 import json
-from google import genai
 import re
 
 # Configuration paths
@@ -21,24 +20,22 @@ LLM_PROMPT_TEMPLATE = config["llm_prompt_template"]
 CHROMA_DB_FOLDER = "data/chromadb_store_en"
 OPENAI_MODEL = "text-embedding-3-small"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 MAX_CALLS = 100000
 MAX_TOKENS = 16000
 call_count = 0
 
 MAX_CHAT_HISTORY =  config["max_chat_history"]
-if MAX_CHAT_HISTORY == None:
+if MAX_CHAT_HISTORY is None:
     MAX_CHAT_HISTORY = 6
 
 
-if not OPENAI_API_KEY or not GEMINI_API_KEY:
+if not OPENAI_API_KEY:
     raise ValueError("Missing API keys. Check your environment variables.")
 
 chroma_client = chromadb.PersistentClient(path=CHROMA_DB_FOLDER)
 collection = chroma_client.get_or_create_collection(name="memory")
 openai_client = openai.OpenAI(api_key=OPENAI_API_KEY)
-genai_client = genai.Client(api_key=GEMINI_API_KEY)
 
 # Cargar el diccionario desde el JSON
 with open('data/config/dictionary.json', 'r', encoding='utf-8') as f:
@@ -111,12 +108,6 @@ def improve_user_prompt_old(user_prompt):
     )
 
     return call_openai(prompt)
-
-    ## Call LLM
-    #response = genai_client.models.generate_content(
-    #    model="gemini-2.0-flash", contents=prompt
-    #)
-    #return response.text
 
 def improve_user_prompt(user_prompt, chat_history_local):
     # Asegurarse de que solo se usan los últimos 5 mensajes
@@ -194,16 +185,9 @@ def handle_query_old(query:str):
 
     # Build LLM prompt
     prompt = LLM_PROMPT_TEMPLATE.format(user_query=improved_query, info=info)
-    prompt_marker = "Short answer in English:"
 
     response = call_openai(prompt)
 
-    #client = genai.Client(api_key=GEMINI_API_KEY)
-    #response = client.models.generate_content(
-    #    model="gemini-2.0-flash", contents=prompt
-    #)
-
-   # clean_response = extract_response(response.text, prompt_marker)
     print("\nAnswer from LLM:\n")
     print(response)
     return response
