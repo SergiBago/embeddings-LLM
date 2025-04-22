@@ -3,6 +3,7 @@ import chromadb
 import openai
 import json
 import re
+from collections import OrderedDict
 
 # Configuration paths
 CONFIG_FILE = "config/config.json"
@@ -17,7 +18,7 @@ with open(CONFIG_FILE, 'r', encoding='utf-8') as config_file:
 PROMPT_IMPROVEMENT = config["prompt_improvement"]
 LLM_PROMPT_TEMPLATE = config["llm_prompt_template"]
 
-CHROMA_DB_FOLDER = "data/chromadb_store_en"
+CHROMA_DB_FOLDER = "docker_data/chromadb_store_en"
 OPENAI_MODEL = "text-embedding-3-small"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
@@ -109,6 +110,41 @@ def improve_user_prompt_old(user_prompt):
 
     return call_openai(prompt)
 
+def extract_idx_from_id(sentence_id):
+    # Extrae el índice numérico de algo como 'ruta/sentence23_part0'
+    match = re.search(r'_sentence(\d+)_part\d+', sentence_id)
+    return int(match.group(1)) if match else None
+
+def get_embedding_results_info(query_embedding, results, join_x_sentences):
+
+    results = collection.query(query_embeddings=query_embedding, n_results=results)
+
+    all_ids = []
+
+    for current_id in results['ids'][0]:
+        idx = extract_idx_from_id(current_id)
+        if idx is None:
+            continue
+        # Genera los IDs de la frase actual y las +/-2 vecinas
+        base_path = current_id.split("_sentence")[0]
+        for offset in range(-join_x_sentences, join_x_sentences + 1):
+            neighbor_idx = idx + offset
+            if neighbor_idx < 0:
+                continue
+            neighbor_id = f"{base_path}_sentence{neighbor_idx}_part0"
+            all_ids.append(neighbor_id)
+
+    # Elimina duplicados preservando el orden
+    unique_ids = list(OrderedDict.fromkeys(all_ids))
+
+    # Recupera las frases por ID
+    neighbors = collection.get(ids=unique_ids)
+
+    info = "".join([f"- {meta['sentence']}\n" for meta in neighbors["metadatas"]])
+
+    return info
+
+
 def improve_user_prompt(user_prompt, chat_history_local):
     # Asegurarse de que solo se usan los últimos 5 mensajes
     last_turns = chat_history_local[-8:]
@@ -137,8 +173,8 @@ def improve_user_prompt(user_prompt, chat_history_local):
 
     # Obtener embeddings para esta consulta
     query_embedding = get_openai_embedding(user_prompt)
-    results = collection.query(query_embeddings=query_embedding, n_results=6)
-    info = "".join([f"- {meta['sentence']}\n" for meta in results["metadatas"][0]])
+
+    info = get_embedding_results_info(query_embedding, 6, 2)
 
     # Construir el nuevo prompt con historial
     full_prompt = PROMPT_IMPROVEMENT.format(
@@ -202,11 +238,13 @@ def handle_query(query: str, chat_history:[]):
     if not query_embedding:
         return "Error generating embedding for query."
 
-    results = collection.query(query_embeddings=query_embedding, n_results=12)
-    if not results["ids"] or not results["ids"][0]:
-        return "No relevant information found."
+    info = get_embedding_results_info(query_embedding, 9,4)
 
-    info = "\n".join(f"- {m['sentence']}" for m in results["metadatas"][0])
+    #results = collection.query(query_embeddings=query_embedding, n_results=10)
+    #if not results["ids"] or not results["ids"][0]:
+    #    return "No relevant information found."
+
+    #info = "\n".join(f"- {m['sentence']}" for m in results["metadatas"][0])
 
     final_prompt = LLM_PROMPT_TEMPLATE.format(user_query=improved_query, info=info)
     response = call_openai(final_prompt)

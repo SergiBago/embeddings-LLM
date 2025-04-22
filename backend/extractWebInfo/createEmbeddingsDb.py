@@ -7,12 +7,16 @@ from bs4 import BeautifulSoup
 from docling.document_converter import DocumentConverter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
+import nltk
+import tiktoken
+
+from nltk.tokenize import sent_tokenize
 
 lock = threading.Lock()  # Lock global para sincronizar acceso a progress_dict
 
 # Configuración
 DATA_FOLDER = "data/markdown"
-CHROMA_DB_FOLDER = "data/chromadb_store_en"
+CHROMA_DB_FOLDER = "data/chromadb_store"
 OPENAI_MODEL = "text-embedding-3-small"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 MAX_CHARS = 16000
@@ -25,6 +29,11 @@ if not OPENAI_API_KEY:
 # Inicializar ChromaDB
 chroma_client = chromadb.PersistentClient(path=CHROMA_DB_FOLDER)
 collection = chroma_client.get_or_create_collection(name="memory")
+
+# Descargar el tokenizer si no lo tienes
+nltk.download('punkt_tab')
+encoding = tiktoken.encoding_for_model("text-embedding-ada-002")
+
 
 # Configurar cliente OpenAI
 client = openai.OpenAI(api_key=OPENAI_API_KEY)
@@ -118,10 +127,41 @@ def get_openai_embedding_pdfs(texts):
         return None
     
 
-# Función para dividir el texto en frases
 def split_into_sentences(text):
-    sentences = re.split(r'(?<=[.!?])\s+', text)
-    return [s.strip() for s in sentences if s.strip()]
+    max_tokens = 1400
+    # Patrón para detectar títulos con cierto formato
+    sections = re.split(r'\n{3,}', text)  # separa por líneas vacías dobles
+    chunks = []
+
+    for section in sections:
+        sentences = sent_tokenize(section)
+        current_chunk = []
+
+        current_length = 0
+
+        for sentence in sentences:
+            sentence_tokens = len(encoding.encode(sentence))
+            # Si pasaría el límite, cierra el chunk actual y empieza uno nuevo
+            if current_length + sentence_tokens > max_tokens:
+                if current_chunk:
+                    chunks.append(" ".join(current_chunk))
+                current_chunk = [sentence]
+                current_length = sentence_tokens
+            else:
+                current_chunk.append(sentence)
+                current_length += sentence_tokens
+
+        # Añade el último chunk
+        if current_chunk:
+            chunks.append(" ".join(current_chunk))
+
+    return chunks
+
+
+# Función para dividir el texto en frases
+#def split_into_sentences(text):
+#    sentences = re.split(r'(?<=[.!?])\s+', text)
+#    return [s.strip() for s in sentences if s.strip()]
 
 
 # Procesar archivos Markdown en todas las subcarpetas

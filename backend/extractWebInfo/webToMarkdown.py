@@ -17,14 +17,50 @@ LANG_PREFIXES =  config["ignore_langs"]
 #Ignorar elements que no es puguin convertir a markdown
 IGNORE_TYPES = config["ignore_types"]
 
+DOWNLOADED_FILES = "data/downloaded.txt"
+PENDING_URLS_FILE = "data/pending_urls.txt"
+
+visited_urls = set()
+
+def load_downloaded_urls():
+    global visited_urls
+    if not os.path.exists(DOWNLOADED_FILES):
+        os.makedirs(os.path.dirname(DOWNLOADED_FILES), exist_ok=True)
+        open(DOWNLOADED_FILES, "w", encoding="utf-8").close()
+        visited_urls = set()
+    with open(DOWNLOADED_FILES, "r", encoding="utf-8") as f:
+        visited_urls = set(line.strip() for line in f.readlines())
+
+def save_downloaded_url(url):
+    visited_urls.add(url)
+    with open(DOWNLOADED_FILES, "a", encoding="utf-8") as f:
+        f.write(url + "\n")
+
+load_downloaded_urls()
+
+pending_urls = []
+
+def load_pending_urls():
+    global pending_urls
+    if not os.path.exists(PENDING_URLS_FILE):
+        os.makedirs(os.path.dirname(PENDING_URLS_FILE), exist_ok=True)
+        open(PENDING_URLS_FILE, "w", encoding="utf-8").close()
+        pending_urls = []
+    else:
+        with open(PENDING_URLS_FILE, "r", encoding="utf-8") as f:
+            pending_urls = [line.strip() for line in f.readlines()]
+
+def save_pending_urls(url):
+    pending_urls.append(url)
+    with open(PENDING_URLS_FILE, "a", encoding="utf-8") as f:
+        f.write(url + "\n")
+
+load_pending_urls()
+
 # Folder to store Markdown files
 SAVE_FOLDER = ""
 #os.makedirs(SAVE_FOLDER, exist_ok=True)
 
-# Track visited URLs to avoid duplicates
-visited_urls = set()
-
-pending_urls=[]
 
 MAX_FILES =  config["max_files"]
 if(MAX_FILES == None):
@@ -121,8 +157,9 @@ def scrape_page(url, base_url):
             md_relative_path = os.path.relpath(md_filepath, SAVE_FOLDER)
 
             # Add the URL to pending_urls so it will be downloaded later
-            if absolute_link not in visited_urls and absolute_link not in pending_urls:
-                pending_urls.append(absolute_link)
+            if absolute_link not in visited_urls and absolute_link not in pending_urls and not should_ignore_url(
+                        absolute_link):
+                save_pending_urls(absolute_link)
 
             a_tag["href"] = f"./{md_relative_path}"  # Update the link to be relative
 
@@ -141,33 +178,31 @@ def scrape_page(url, base_url):
     with open(md_filepath, "w", encoding="utf-8") as f:
         f.write(md_content)
 
-    # Mark as visited
-    visited_urls.add(url)
-
     return md_filepath
 
 
 def downloadWebsite(url, folder, task_id, progress_dict):
-    global pending_urls
     global SAVE_FOLDER
+    global visited_urls
+    global pending_urls
 
     SAVE_FOLDER = folder
 
-    base_url = url
-    pending_urls = [base_url]
+    load_downloaded_urls()
 
-    pending_urls = [url]
+    base_url = url
+    pending_urls.append(base_url)
 
     count = 0
 
     while pending_urls and count < MAX_FILES:
         current_url = pending_urls.pop(0)
 
+        if current_url in visited_urls:
+            continue  # Ya descargada, la saltamos
+
         if should_ignore_url(current_url):
             print(f"Ignoring page: {current_url}")
-            continue
-
-        if current_url in visited_urls:
             continue
 
         this_task = f"Downloading {current_url}..."
@@ -175,19 +210,24 @@ def downloadWebsite(url, folder, task_id, progress_dict):
 
         filename = scrape_page(current_url, base_url)
 
-        if filename:
+        #if filename:
+
             # Extract new links from the downloaded page
-            with open(filename, "r", encoding="utf-8") as f:
-                md_text = f.read()
+         #   with open(filename, "r", encoding="utf-8") as f:
+          #      md_text = f.read()
 
-            soup = BeautifulSoup(md_text, "html.parser")
-            for a_tag in soup.find_all("a", href=True):
-                absolute_link = urljoin(base_url, a_tag["href"])
+            #soup = BeautifulSoup(md_text, "html.parser")
 
-                # Avoid adding language-only URLs
-                if absolute_link.startswith(base_url) and absolute_link not in visited_urls and not should_ignore_url(
-                        absolute_link):
-                    pending_urls.append(absolute_link)
+            #for a_tag in soup.find_all("a", href=True):
+            #    absolute_link = urljoin(base_url, a_tag["href"])
+
+            #    # Avoid adding language-only URLs
+            #    if absolute_link.startswith(base_url) and absolute_link not in visited_urls and not should_ignore_url(
+            #            absolute_link):
+            #        save_pending_urls(absolute_link)
+
+        # Mark as visited
+        save_downloaded_url(current_url)
 
         progress_dict[task_id]['text'] = progress_dict[task_id]['text'].replace(
             this_task,
