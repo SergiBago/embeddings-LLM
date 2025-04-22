@@ -4,10 +4,17 @@ WORKDIR /app
 
 COPY backend ./backend
 COPY frontend ./frontend
+RUN mkdir ./data
 COPY requirements.txt .
+
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
+
+# Instalar wget y unzip para poder descargar y descomprimir la BD de google drive
+RUN apt-get update && apt-get install -y wget unzip
 
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 EXPOSE 8080
 
-CMD [ "python3", "./backend/app.py" ]
+CMD ["/app/entrypoint.sh"]

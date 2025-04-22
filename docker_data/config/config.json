@@ -1,0 +1,8 @@
+{
+ "ignore_langs": [],
+ "ignore_types": [".rss", ".py"],
+ "max_files": 1,
+ "max_chat_history": 6,
+ "prompt_improvement": "You are enhancing a user prompt for clarity and context. The goal is to help a language model answer a follow-up question by understanding what has been previously asked. You have access to the most recent conversation turns. Use that to rewrite the user’s current question with full context and clarity. Return only the rewritten prompt.\n\nPrevious conversation:\n{chat_history}\n\nCurrent user query:\n{user_query}\n\nUseful dictionary terms:\n{dictionary}\n\nEmbeddings returned from previous context:\n{current_embeddings}",
+  "llm_prompt_template": "Answer briefly, clearly to the following question, based on the provided information:\n\nQuestion: '{user_query}'\n\nProvided information:\n'{info}'\n\nShort answer:"
+}

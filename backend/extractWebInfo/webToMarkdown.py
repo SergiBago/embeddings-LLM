@@ -3,18 +3,22 @@ from bs4 import BeautifulSoup
 import markdownify
 import os
 from urllib.parse import urljoin, urlparse
+import json
 
-# Define base URL
-BASE_URL = "https://www.fib.upc.edu/en/"
+# Configuration paths
+CONFIG_FILE = "data/config/config.json"
+# Load configurations
+with open(CONFIG_FILE, 'r', encoding='utf-8') as config_file:
+    config = json.load(config_file)
 
 # Define language prefixes to ignore (ignores base language pages but keeps subpages)
-LANG_PREFIXES = ["/ca", "/es"]
+LANG_PREFIXES =  config["ignore_langs"]
 
 #Ignorar elements que no es puguin convertir a markdown
-IGNORE_TYPES = [".rss", ".py"]
+IGNORE_TYPES = config["ignore_types"]
 
 # Folder to store Markdown files
-SAVE_FOLDER = "markdown"
+SAVE_FOLDER = ""
 #os.makedirs(SAVE_FOLDER, exist_ok=True)
 
 # Track visited URLs to avoid duplicates
@@ -22,25 +26,30 @@ visited_urls = set()
 
 pending_urls=[]
 
-def url_to_filepath(url):
+MAX_FILES =  config["max_files"]
+if(MAX_FILES == None):
+    MAX_FILES = 500
+
+def url_to_filepath(url, is_pdf=False):
     """
-    Convert a URL to a valid Markdown file path with subfolders.
-    Example: "https://www.fib.upc.edu/en/mobility/outgoing/mobility-calendar"
-    → "fib_markdown/en/mobility/outgoing/mobility-calendar.md"
+    Convert a URL to a valid file path with subfolders.
+    - If it's a webpage → save as Markdown (`.md`).
+    - If it's a PDF → save with the original extension (`.pdf`).
     """
     path = urlparse(url).path.strip("/")
-
     if not path or path == "/":
-        return os.path.join(SAVE_FOLDER, "index.md")
+        return os.path.join(SAVE_FOLDER, "_index.md")
 
-    # Create the full folder structure
+    # Ensure the full folder structure exists
     full_path = os.path.join(SAVE_FOLDER, path)
+    if is_pdf:
+        os.makedirs(os.path.dirname(full_path), exist_ok=True)
+        return full_path  # Keep .pdf extension
+
     if not full_path.endswith(".md"):
         full_path += ".md"
 
-    # Ensure the folder exists before saving the file
     os.makedirs(os.path.dirname(full_path), exist_ok=True)
-
     return full_path
 
 
@@ -52,19 +61,38 @@ def should_ignore_url(url):
 
     """Check if the URL is just a language version of the main page."""
     for prefix in LANG_PREFIXES:
-        if url.endswith(prefix) or prefix+"/" in url:
+        pre = "/" + prefix
+        if url.endswith(pre) or pre+"/" in url:
             return True
     return False
 
 
-def scrape_page(url):
-    """Extracts content from a webpage and converts it to Markdown."""
-    if should_ignore_url(url):
-        print(f"Ignoring page: {url}")
+def download_pdf(url):
+    """Downloads a PDF and saves it in the correct subfolder."""
+    pdf_path = url_to_filepath(url, is_pdf=True)
+    if not pdf_path.endswith(".pdf"):
+        pdf_path += ".pdf"
+
+    # Check if PDF was already downloaded
+    if os.path.exists(pdf_path):
+        return pdf_path
+
+    print(f"Downloading PDF: {url}")
+
+    try:
+        response = requests.get(url, stream=True)
+        response.raise_for_status()
+        with open(pdf_path, "wb") as pdf_file:
+            for chunk in response.iter_content(chunk_size=1024):
+                pdf_file.write(chunk)
+        return pdf_path
+    except requests.RequestException as e:
+        print(f"❌ Failed to download {url}: {e}")
         return None
 
-    if url in visited_urls:
-        return None
+
+def scrape_page(url, base_url):
+    """Extracts content from a webpage and converts it to Markdown."""
 
     print(f"Scraping: {url}")
 
@@ -78,10 +106,17 @@ def scrape_page(url):
     # Process links before converting to Markdown
     for a_tag in soup.find_all("a", href=True):
         original_link = a_tag["href"]
-        absolute_link = urljoin(BASE_URL, original_link)
+        absolute_link = urljoin(base_url, original_link)
+
+        # Handle PDFs separately
+        if absolute_link.lower().endswith(".pdf"):
+            pdf_path = download_pdf(absolute_link)
+            if pdf_path:
+                a_tag["href"] = f"./{os.path.relpath(pdf_path, SAVE_FOLDER)}"  # Update PDF link
+            continue
 
         # Convert internal links to Markdown files
-        if absolute_link.startswith(BASE_URL):
+        if absolute_link.startswith(base_url):
             md_filepath = url_to_filepath(absolute_link)
             md_relative_path = os.path.relpath(md_filepath, SAVE_FOLDER)
 
@@ -95,7 +130,7 @@ def scrape_page(url):
     # Process image sources before converting to Markdown
     for img_tag in soup.find_all("img", src=True):
         original_src = img_tag["src"]
-        absolute_src = urljoin(BASE_URL, original_src)
+        absolute_src = urljoin(base_url, original_src)
         img_tag["src"] = absolute_src
 
     # Convert HTML to Markdown
@@ -112,19 +147,33 @@ def scrape_page(url):
     return md_filepath
 
 
-def downloadWebsite(url, folder):
-    SAVE_FOLDER = folder
-    # Start with the main page
+def downloadWebsite(url, folder, task_id, progress_dict):
+    global pending_urls
+    global SAVE_FOLDER
 
-    parsed_url = urlparse(url)
-    hostname = parsed_url.hostname or ""
-    BASE_URL = hostname.replace('.', '_')
+    SAVE_FOLDER = folder
+
+    base_url = url
+    pending_urls = [base_url]
 
     pending_urls = [url]
 
-    while pending_urls:
+    count = 0
+
+    while pending_urls and count < MAX_FILES:
         current_url = pending_urls.pop(0)
-        filename = scrape_page(current_url)
+
+        if should_ignore_url(current_url):
+            print(f"Ignoring page: {current_url}")
+            continue
+
+        if current_url in visited_urls:
+            continue
+
+        this_task = f"Downloading {current_url}..."
+        progress_dict[task_id]['text'] += "\n" + this_task
+
+        filename = scrape_page(current_url, base_url)
 
         if filename:
             # Extract new links from the downloaded page
@@ -133,11 +182,17 @@ def downloadWebsite(url, folder):
 
             soup = BeautifulSoup(md_text, "html.parser")
             for a_tag in soup.find_all("a", href=True):
-                absolute_link = urljoin(BASE_URL, a_tag["href"])
+                absolute_link = urljoin(base_url, a_tag["href"])
 
                 # Avoid adding language-only URLs
-                if absolute_link.startswith(BASE_URL) and absolute_link not in visited_urls and not should_ignore_url(
+                if absolute_link.startswith(base_url) and absolute_link not in visited_urls and not should_ignore_url(
                         absolute_link):
                     pending_urls.append(absolute_link)
+
+        progress_dict[task_id]['text'] = progress_dict[task_id]['text'].replace(
+            this_task,
+            f"✅ Downloaded {current_url}"
+        )
+        count += 1
 
     print("✅ Download complete!")
