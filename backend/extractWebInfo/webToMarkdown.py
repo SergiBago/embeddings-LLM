@@ -208,7 +208,11 @@ def downloadWebsite(url, folder, task_id, progress_dict):
         this_task = f"Downloading {current_url}..."
         progress_dict[task_id]['text'] += "\n" + this_task
 
-        filename = scrape_page(current_url, base_url)
+        try:
+            scrape_page(current_url, base_url)
+
+        except Exception as e:
+            print(str(e))
 
         #if filename:
 
