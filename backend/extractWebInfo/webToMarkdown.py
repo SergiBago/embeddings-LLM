@@ -6,7 +6,7 @@ from urllib.parse import urljoin, urlparse
 import json
 
 # Configuration paths
-CONFIG_FILE = "data/config/config.json"
+CONFIG_FILE = "config/config.json"
 # Load configurations
 with open(CONFIG_FILE, 'r', encoding='utf-8') as config_file:
     config = json.load(config_file)

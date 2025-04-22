@@ -19,7 +19,7 @@ Clave para acceder a la API de OpenAI.
 👉 Más info: https://openai.com
 
 ### Fichero de Configuración
-Si quieres, modifica el valor de las variables del fichero `docker_data/config/config.json`
+Si quieres, modifica el valor de las variables del fichero `config/config.json`
 
 #### Detalles de las variables
 * <b>ignore_langs</b> Lista de idiomas a ignorar. La mayoria de sitios web tienen /ca para catalán, /es para español y /en para ingles. El modelo de embeddings que usamos es capaz de calcular los embeddins en multi idioma, por lo que no es necesario bajar todos los idiomas
@@ -31,7 +31,7 @@ Si quieres, modifica el valor de las variables del fichero `docker_data/config/c
 
 ## 📖 Diccionario
 
-El chatbot usa un diccionario para entender mejor algunos acrónimos, como FIB, ETCS, TFG,... Modificalo para añadir los acrónimos que consideres necesarios. El diccionario es el fichero json en `docker_data/donfig/dictionary.json`
+El chatbot usa un diccionario para entender mejor algunos acrónimos, como FIB, ETCS, TFG,... Modificalo para añadir los acrónimos que consideres necesarios. El diccionario es el fichero json en `config/dictionary.json`
 
 
 ---
