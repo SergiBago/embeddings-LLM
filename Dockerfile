@@ -5,6 +5,7 @@ WORKDIR /app
 COPY backend ./backend
 COPY frontend ./frontend
 RUN mkdir ./data
+RUN mkdir ./config
 COPY requirements.txt .
 
 COPY entrypoint.sh ./entrypoint.sh

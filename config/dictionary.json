@@ -1,171 +1,1005 @@
 {
-    "FIB": {
-      "es": "Facultad de Informática de Barcelona",
-      "en": "Barcelona School of Informatics",
-      "type": "organization"
-    },
-    "UPC": {
-      "es": "Universidad Politécnica de Cataluña",
-      "en": "Polytechnic University of Catalonia",
-      "type": "organization"
-    },
-  "DGIS": {
+  "FIB": {
+    "es": "Facultad de Informática de Barcelona",
+    "en": "Barcelona School of Informatics",
+    "ca": "Facultat d'Informàtica de Barcelona",
+    "type": "organization"
+  },
+  "UPC": {
+    "es": "Universidad Politécnica de Cataluña",
+    "en": "Polytechnic University of Catalonia",
+    "ca": "Universitat Politècnica de Catalunya",
+    "type": "organization"
+  },
+  "DGSI": {
     "es": "Desarrollo y Gestión de Sistemas de Información",
     "en": "Development and Management of Information Systems",
+    "ca": "Desenvolupament i Gestió de Sistemes d'Informació",
     "type": "subject"
   },
-    "ICFO": {
-      "es": "Instituto de Ciencias Fotónicas",
-      "en": "Institute of Photonic Sciences",
-      "type": "organization"
-    },
-    "OW": {
-      "es": "Semana de orientación",
-      "en": "Orientation Week",
-      "description": "Programa de 2 días que incluye bienvenida institucional, información sobre trámites y servicios universitarios",
-      "type": "program"
-    },
-    "TOEFL": {
-      "en": "Test of English as a Foreign Language",
-      "type": "certificate"
-    },
-    "IELTS": {
-      "en": "International English Language Testing System",
-      "type": "certificate"
-    },
-    "TFM": {
-      "es": "Trabajo de Fin de Máster",
-      "en": "Master’s Thesis",
-      "type": "academic requirement"
-    },
-    "ECTS": {
-      "es": "Sistema Europeo de Transferencia de Créditos",
-      "en": "European Credit Transfer System",
-      "description": "Sistema para estandarizar el reconocimiento académico en Europa",
-      "type": "academic credit"
-    },
-    "AI": {
-      "es": "Inteligencia Artificial",
-      "en": "Artificial Intelligence",
-      "type": "technology"
-    },
-    "ML": {
-      "es": "Aprendizaje Automático",
-      "en": "Machine Learning",
-      "type": "technology"
-    },
-    "CV": {
-      "es": "Visión por Computador",
-      "en": "Computer Vision",
-      "type": "technology"
-    },
-    "NLP": {
-      "es": "Procesamiento del Lenguaje Natural",
-      "en": "Natural Language Processing",
-      "type": "technology"
-    },
-    "GPU": {
-      "en": "Graphics Processing Unit",
-      "description": "Hardware especializado para procesamiento paralelo, comúnmente usado en IA",
-      "type": "hardware"
-    },
-    "AWS": {
-      "en": "Amazon Web Services",
-      "type": "cloud platform"
-    },
-    "GCP": {
-      "en": "Google Cloud Platform",
-      "type": "cloud platform"
-    },
-    "Azure": {
-      "en": "Microsoft Azure",
-      "type": "cloud platform"
-    },
-    "K8s": {
-      "en": "Kubernetes",
-      "description": "Sistema de orquestación de contenedores de código abierto",
-      "type": "infrastructure"
-    },
-    "TF": {
-      "en": "TensorFlow",
-      "description": "Framework de aprendizaje automático de código abierto desarrollado por Google",
-      "type": "framework"
-    },
-    "PyTorch": {
-      "en": "PyTorch",
-      "description": "Framework de aprendizaje profundo desarrollado por Facebook",
-      "type": "framework"
-    },
-    "GPT": {
-      "en": "Generative Pre-trained Transformer",
-      "type": "language model"
-    },
-    "SQL": {
-      "en": "Structured Query Language",
-      "type": "language"
-    },
-    "CI/CD": {
-      "en": "Continuous Integration / Continuous Deployment",
-      "type": "devops process"
-    },
-    "API": {
-      "en": "Application Programming Interface",
-      "type": "interface"
-    },
-    "HTTP": {
-      "en": "HyperText Transfer Protocol",
-      "type": "protocol"
-    },
-    "REST": {
-      "en": "Representational State Transfer",
-      "type": "architecture"
-    },
-    "JSON": {
-      "en": "JavaScript Object Notation",
-      "type": "data format"
-    },
-    "BSc": {
-      "en": "Bachelor of Science",
-      "type": "degree"
-    },
-    "MSc": {
-      "en": "Master of Science",
-      "type": "degree"
-    },
-    "PhD": {
-      "en": "Doctor of Philosophy",
-      "type": "degree"
-    },
-    "GPA": {
-      "en": "Grade Point Average",
-      "type": "academic metric"
-    },
-    "QA": {
-      "en": "Quality Assurance",
-      "type": "process"
-    },
-    "UX": {
-      "en": "User Experience",
-      "type": "design"
-    },
-    "UI": {
-      "en": "User Interface",
-      "type": "design"
-    },
-    "PDF": {
-      "en": "Portable Document Format",
-      "type": "file format"
-    },
-    "CSV": {
-      "en": "Comma-Separated Values",
-      "type": "file format"
-    },
-    "IDE": {
-      "en": "Integrated Development Environment",
-      "type": "tool"
-    },
-    "VSCode": {
-      "en": "Visual Studio Code",
-      "type": "IDE"
-    }
-  }
+  "ICFO": {
+    "es": "Instituto de Ciencias Fotónicas",
+    "en": "Institute of Photonic Sciences",
+    "ca": "Institut de Ciències Fotòniques",
+    "type": "organization"
+  },
+  "OW": {
+    "es": "Semana de orientación",
+    "en": "Orientation Week",
+    "ca": "Setmana d'orientació",
+    "description": "Programa de 2 días que incluye bienvenida institucional, información sobre trámites y servicios universitarios",
+    "type": "program"
+  },
+  "TOEFL": {
+    "en": "Test of English as a Foreign Language",
+    "ca": "Test d'Anglès com a Llengua Estrangera",
+    "es": "Prueba de Inglés como Lengua Extranjera",
+    "type": "certificate"
+  },
+  "IELTS": {
+    "en": "International English Language Testing System",
+    "ca": "Sistema Internacional de Prova d'Anglès",
+    "es": "Sistema Internacional de Evaluación del Idioma Inglés",
+    "type": "certificate"
+  },
+  "TFM": {
+    "es": "Trabajo de Fin de Máster",
+    "en": "Master’s Thesis",
+    "ca": "Treball de Fi de Màster",
+    "type": "academic requirement"
+  },
+  "ECTS": {
+    "es": "Sistema Europeo de Transferencia de Créditos",
+    "en": "European Credit Transfer System",
+    "ca": "Sistema Europeu de Transferència de Crèdits",
+    "description": "Sistema para estandarizar el reconocimiento académico en Europa",
+    "type": "academic credit"
+  },
+  "AI": {
+    "es": "Inteligencia Artificial",
+    "en": "Artificial Intelligence",
+    "ca": "Intel·ligència Artificial",
+    "type": "technology"
+  },
+  "ML": {
+    "es": "Aprendizaje Automático",
+    "en": "Machine Learning",
+    "ca": "Aprenentatge Automàtic",
+    "type": "technology"
+  },
+  "CV": {
+    "es": "Visión por Computador",
+    "en": "Computer Vision",
+    "ca": "Visió per Computador",
+    "type": "technology"
+  },
+  "NLP": {
+    "es": "Procesamiento del Lenguaje Natural",
+    "en": "Natural Language Processing",
+    "ca": "Processament del Llenguatge Natural",
+    "type": "technology"
+  },
+  "GPU": {
+    "en": "Graphics Processing Unit",
+    "ca": "Unitat de Processament Gràfic",
+    "es": "Unidad de Procesamiento Gráfico",
+    "description": "Hardware especializado para procesamiento paralelo, comúnmente usado en IA",
+    "type": "hardware"
+  },
+  "AWS": {
+    "en": "Amazon Web Services",
+    "ca": "Serveis Web d'Amazon",
+    "es": "Servicios Web de Amazon",
+    "type": "cloud platform"
+  },
+  "GCP": {
+    "en": "Google Cloud Platform",
+    "ca": "Plataforma de Núvol de Google",
+    "es": "Plataforma de Nube de Google",
+    "type": "cloud platform"
+  },
+  "Azure": {
+    "en": "Microsoft Azure",
+    "ca": "Microsoft Azure",
+    "es": "Microsoft Azure",
+    "type": "cloud platform"
+  },
+  "K8s": {
+    "en": "Kubernetes",
+    "ca": "Kubernetes",
+    "es": "Kubernetes",
+    "description": "Sistema de orquestación de contenedores de código abierto",
+    "type": "infrastructure"
+  },
+  "TF": {
+    "en": "TensorFlow",
+    "ca": "TensorFlow",
+    "es": "TensorFlow",
+    "description": "Framework de aprendizaje automático de código abierto desarrollado por Google",
+    "type": "framework"
+  },
+  "PyTorch": {
+    "en": "PyTorch",
+    "ca": "PyTorch",
+    "es": "PyTorch",
+    "description": "Framework de aprendizaje profundo desarrollado por Facebook",
+    "type": "framework"
+  },
+  "GPT": {
+    "en": "Generative Pre-trained Transformer",
+    "ca": "Transformador Generatiu Preentrenat",
+    "es": "Transformador Generativo Preentrenado",
+    "type": "language model"
+  },
+  "SQL": {
+    "en": "Structured Query Language",
+    "ca": "Llenguatge de Consultes Estructurat",
+    "es": "Lenguaje de Consulta Estructurado",
+    "type": "language"
+  },
+  "CI/CD": {
+    "en": "Continuous Integration / Continuous Deployment",
+    "ca": "Integració i Desplegament Continu",
+    "es": "Integración y Despliegue Continuo",
+    "type": "devops process"
+  },
+  "API": {
+    "en": "Application Programming Interface",
+    "ca": "Interfície de Programació d'Aplicacions",
+    "es": "Interfaz de Programación de Aplicaciones",
+    "type": "interface"
+  },
+  "HTTP": {
+    "en": "HyperText Transfer Protocol",
+    "ca": "Protocol de Transferència d'Hipertext",
+    "es": "Protocolo de Transferencia de Hipertexto",
+    "type": "protocol"
+  },
+  "REST": {
+    "en": "Representational State Transfer",
+    "ca": "Transferència d'Estat Representacional",
+    "es": "Transferencia de Estado Representacional",
+    "type": "architecture"
+  },
+  "JSON": {
+    "en": "JavaScript Object Notation",
+    "ca": "Notació d'Objectes de JavaScript",
+    "es": "Notación de Objetos de JavaScript",
+    "type": "data format"
+  },
+  "BSc": {
+    "en": "Bachelor of Science",
+    "ca": "Grau en Ciències",
+    "es": "Grado en Ciencias",
+    "type": "degree"
+  },
+  "MSc": {
+    "en": "Master of Science",
+    "ca": "Màster en Ciències",
+    "es": "Máster en Ciencias",
+    "type": "degree"
+  },
+  "PhD": {
+    "en": "Doctor of Philosophy",
+    "ca": "Doctorat",
+    "es": "Doctorado",
+    "type": "degree"
+  },
+  "GPA": {
+    "en": "Grade Point Average",
+    "ca": "Mitjana Ponderada d'Estudis",
+    "es": "Promedio de Calificaciones",
+    "type": "academic metric"
+  },
+  "QA": {
+    "en": "Quality Assurance",
+    "ca": "Assegurament de la Qualitat",
+    "es": "Aseguramiento de la Calidad",
+    "type": "process"
+  },
+  "UX": {
+    "en": "User Experience",
+    "ca": "Experiència d'Usuari",
+    "es": "Experiencia de Usuario",
+    "type": "design"
+  },
+  "UI": {
+    "en": "User Interface",
+    "ca": "Interfície d'Usuari",
+    "es": "Interfaz de Usuario",
+    "type": "design"
+  },
+  "PDF": {
+    "en": "Portable Document Format",
+    "ca": "Format de Document Portàtil",
+    "es": "Formato de Documento Portátil",
+    "type": "file format"
+  },
+  "CSV": {
+    "en": "Comma-Separated Values",
+    "ca": "Valors Separats per Comes",
+    "es": "Valores Separados por Comas",
+    "type": "file format"
+  },
+  "IDE": {
+    "en": "Integrated Development Environment",
+    "ca": "Entorn de Desenvolupament Integrat",
+    "es": "Entorno de Desarrollo Integrado",
+    "type": "tool"
+  },
+  "VSCode": {
+    "en": "Visual Studio Code",
+    "ca": "Visual Studio Code",
+    "es": "Visual Studio Code",
+    "type": "IDE"
+  },
+  "PEGTI": {
+    "es": "Plan Estratégico y Gobierno de Las Tecnologías de la Información",
+    "en": "Strategic Planning and Governance of Information Technologies",
+    "ca": "Pla Estratègic i Govern de Les Tecnologies de la Informació",
+    "type": "subject"
+  },
+  "VPEI": {
+    "es": "Viabilidad de Proyectos Empresariales Innovadores",
+    "en": "Viability of Innovative Business Projects",
+    "ca": "Viabilitat de Projectes Empresarials Innovadors",
+    "type": "subject"
+  },
+  "ACAP": {
+    "es": "Arquitectura de Computadores de Altas Prestaciones",
+    "en": "High-Performance Computer Architecture",
+    "ca": "Arquitectura de Computadors d'Altes Prestacions",
+    "type": "subject"
+  },
+  "CSI": {
+    "es": "Computación y Sistemas Inteligentes",
+    "en": "Computation and Intelligent Systems",
+    "ca": "Computació i Sistemes Intel·ligents",
+    "type": "subject"
+  },
+  "SEU": {
+    "es": "Sistemas Empotrados y Ubicuos",
+    "en": "Embedded and Ubiquitous Systems",
+    "ca": "Sistemes Encastats i Ubicus",
+    "type": "subject"
+  },
+  "SGI": {
+    "es": "Sistemas Gráficos Interactivos",
+    "en": "Interactive Graphics Systems",
+    "ca": "Sistemes Gràfics Interactius",
+    "type": "subject"
+  },
+  "DGSI": {
+    "es": "Desarrollo y Gestión de Sistemas de Información",
+    "en": "Development and Management of Information Systems",
+    "ca": "Desenvolupament i Gestió de Sistemes d'Informació",
+    "type": "subject"
+  },
+  "ISDCM": {
+    "es": "Internet, Seguridad y Distribución de Contenidos Multimedia",
+    "en": "Internet, Security and Multimedia Content Distribution",
+    "ca": "Internet, Seguretat i Distribució de Continguts Multimèdia",
+    "type": "subject"
+  },
+  "I2RM3": {
+    "es": "Introducción a la Investigación",
+    "en": "Introduction to Research",
+    "ca": "Introducció a la Recerca",
+    "type": "subject"
+  },
+  "I2RM6": {
+    "es": "Introducción a la Investigación",
+    "en": "Introduction to Research",
+    "ca": "Introducció a la Recerca",
+    "type": "subject"
+  },
+  "FPEI": {
+    "es": "Financiación para Proyectos Empresariales Innovadores",
+    "en": "Financing for Innovative Business Projects",
+    "ca": "Finançament per a Projectes Empresarials Innovadors",
+    "type": "subject"
+  },
+  "IKPD": {
+    "es": "Incorporación del Know-How en el Proceso de Decisión",
+    "en": "Incorporation of Know-How in the Decision Process",
+    "ca": "Incorporació del Know-How en el Procés de Decisió",
+    "type": "subject"
+  },
+  "MEEGQ": {
+    "es": "El Modelo de Excelencia EFQM y Gestión de la Calidad",
+    "en": "The EFQM Excellence Model and Quality Management",
+    "ca": "El Model d'Excel·lència EFQM i Gestió de la Qualitat",
+    "type": "subject"
+  },
+  "SECS": {
+    "es": "Sostenibilidad, Economía y Compromiso Social",
+    "en": "Sustainability, Economy and Social Commitment",
+    "ca": "Sostenibilitat, Economia i Compromís Social",
+    "type": "subject"
+  },
+  "ARCA": {
+    "es": "Animación Realista de Cuerpos Articulados",
+    "en": "Realistic Animation of Articulated Bodies",
+    "ca": "Animació Realista de Cossos Articulats",
+    "type": "subject"
+  },
+  "CC": {
+    "es": "Cloud Computing",
+    "en": "Cloud Computing",
+    "ca": "Cloud Computing",
+    "type": "subject"
+  },
+  "DSIGE": {
+    "es": "Desarrollo de Software para la Información Geográfica y Espacial",
+    "en": "Software Development for Geographic and Spatial Information",
+    "ca": "Desenvolupament de Software per a la Informació Geogràfica i Espacial",
+    "type": "subject"
+  },
+  "IA": {
+    "es": "Interfaces y Accesibilidad",
+    "en": "Interfaces and Accessibility",
+    "ca": "Interfícies i Accessibilitat",
+    "type": "subject"
+  },
+  "ID": {
+    "es": "Identidad Digital",
+    "en": "Digital Identity",
+    "ca": "Identitat Digital",
+    "type": "subject"
+  },
+  "IESI": {
+    "es": "Integración Empresarial de Sistemas de Información",
+    "en": "Business Integration of Information Systems",
+    "ca": "Integració Empresarial de Sistemes d'Informació",
+    "type": "subject"
+  },
+  "IT": {
+    "es": "Internet de Las Cosas",
+    "en": "Internet of Things",
+    "ca": "Internet de Les Coses",
+    "type": "subject"
+  },
+  "JC": {
+    "es": "Juego por Ordenador",
+    "en": "Computer Game",
+    "ca": "Joc per Ordinador",
+    "type": "subject"
+  },
+  "PTDMA": {
+    "es": "Programación de Teléfonos y Dispositivos Móviles Autónomos",
+    "en": "Programming of Phones and Autonomous Mobile Devices",
+    "ca": "Programació de Telèfons i Dispositius Mòbils Autònoms",
+    "type": "subject"
+  },
+  "TEB": {
+    "es": "Técnicas y Herramientas Bioinformáticas",
+    "en": "Bioinformatics Techniques and Tools",
+    "ca": "Tècniques i Eines Bioinformàtiques",
+    "type": "subject"
+  },
+  "TIA": {
+    "es": "Tecnologías Informáticas para la Automatización",
+    "en": "Information Technologies for Automation",
+    "ca": "Tecnologies Informàtiques per a l'Automatització",
+    "type": "subject"
+  },
+  "TMD": {
+    "es": "Técnicas de Minería de Datos",
+    "en": "Data Mining Techniques",
+    "ca": "Tècniques de Mineria de Dades",
+    "type": "subject"
+  },
+  "VD": {
+    "es": "Visualización de Datos",
+    "en": "Data Visualization",
+    "ca": "Visualització de Dades",
+    "type": "subject"
+  },
+  "F": {
+    "es": "Física",
+    "en": "Physics",
+    "ca": "Física",
+    "type": "subject"
+  },
+  "FM": {
+    "es": "Fundamentos Matemáticos",
+    "en": "Mathematical Foundations",
+    "ca": "Fonaments Matemàtics",
+    "type": "subject"
+  },
+  "IC": {
+    "es": "Introducción a los Computadores",
+    "en": "Introduction to Computers",
+    "ca": "Introducció als Computadors",
+    "type": "subject"
+  },
+  "PRO1": {
+    "es": "Programación I",
+    "en": "Programming I",
+    "ca": "Programació I",
+    "type": "subject"
+  },
+  "EC": {
+    "es": "Estructura de Computadores",
+    "en": "Computer Structure",
+    "ca": "Estructura de Computadors",
+    "type": "subject"
+  },
+  "M1": {
+    "es": "Matemáticas I",
+    "en": "Mathematics I",
+    "ca": "Matemàtiques I",
+    "type": "subject"
+  },
+  "M2": {
+    "es": "Matemáticas II",
+    "en": "Mathematics II",
+    "ca": "Matemàtiques II",
+    "type": "subject"
+  },
+  "PRO2": {
+    "es": "Programación II",
+    "en": "Programming II",
+    "ca": "Programació II",
+    "type": "subject"
+  },
+  "BD": {
+    "es": "Bases de Datos",
+    "en": "Databases",
+    "ca": "Bases de Dades",
+    "type": "subject"
+  },
+  "CI": {
+    "es": "Interfaces de Computadores",
+    "en": "Computer Interfaces",
+    "ca": "Interfícies de Computadors",
+    "type": "subject"
+  },
+  "EDA": {
+    "es": "Estructuras de Datos y Algoritmos",
+    "en": "Data Structures and Algorithms",
+    "ca": "Estructures de Dades i Algorismes",
+    "type": "subject"
+  },
+  "PE": {
+    "es": "Probabilidad y Estadística",
+    "en": "Probability and Statistics",
+    "ca": "Probabilitat i Estadística",
+    "type": "subject"
+  },
+  "SO": {
+    "es": "Sistemas Operativos",
+    "en": "Operating Systems",
+    "ca": "Sistemes Operatius",
+    "type": "subject"
+  },
+  "AC": {
+    "es": "Arquitectura de Computadores",
+    "en": "Computer Architecture",
+    "ca": "Arquitectura de Computadors",
+    "type": "subject"
+  },
+  "EEE": {
+    "es": "Empresa y Entorno Económico",
+    "en": "Business and Economic Environment",
+    "ca": "Empresa i Entorn Econòmic",
+    "type": "subject"
+  },
+  "IDI": {
+    "es": "Interacción y Diseño de Interfaces",
+    "en": "Interaction and Interface Design",
+    "ca": "Interacció i Disseny d'Interfícies",
+    "type": "subject"
+  },
+  "IES": {
+    "es": "Introducción a la Ingeniería del Software",
+    "en": "Introduction to Software Engineering",
+    "ca": "Introducció a l'Enginyeria del Software",
+    "type": "subject"
+  },
+  "XC": {
+    "es": "Redes de Computadores",
+    "en": "Computer Networks",
+    "ca": "Xarxes de Computadors",
+    "type": "subject"
+  },
+  "PAR": {
+    "es": "Paralelismo",
+    "en": "Parallelism",
+    "ca": "Paral·lelisme",
+    "type": "subject"
+  },
+  "PROP": {
+    "es": "Proyectos de Programación",
+    "en": "Programming Projects",
+    "ca": "Projectes de Programació",
+    "type": "subject"
+  },
+  "A": {
+    "es": "Algorítmica",
+    "en": "Algorithmics",
+    "ca": "Algorítmica",
+    "type": "subject"
+  },
+  "G": {
+    "es": "Gráficos",
+    "en": "Graphics",
+    "ca": "Gràfics",
+    "type": "subject"
+  },
+  "LI": {
+    "es": "Lógica en la Informática",
+    "en": "Logic in Computer Science",
+    "ca": "Lògica en la Informàtica",
+    "type": "subject"
+  },
+  "LP": {
+    "es": "Lenguajes de Programación",
+    "en": "Programming Languages",
+    "ca": "Llenguatges de Programació",
+    "type": "subject"
+  },
+  "TC": {
+    "es": "Teoría de la Computación",
+    "en": "Theory of Computation",
+    "ca": "Teoria de la Computació",
+    "type": "subject"
+  },
+  "AA": {
+    "es": "Ampliación de Algorítmica",
+    "en": "Advanced Algorithmics",
+    "ca": "Ampliació d'Algorítmica",
+    "type": "subject"
+  },
+  "APA": {
+    "es": "Aprendizaje Automático",
+    "en": "Machine Learning",
+    "ca": "Aprenentatge Automàtic",
+    "type": "subject"
+  },
+  "CAIM": {
+    "es": "Búsqueda y Análisis de Información Masiva",
+    "en": "Search and Analysis of Massive Information",
+    "ca": "Cerca i Anàlisi d'Informació Massiva",
+    "type": "subject"
+  },
+  "CL": {
+    "es": "Compiladores",
+    "en": "Compilers",
+    "ca": "Compiladors",
+    "type": "subject"
+  },
+  "CN": {
+    "es": "Computación Numérica",
+    "en": "Numerical Computation",
+    "ca": "Computació Numèrica",
+    "type": "subject"
+  },
+  "IO": {
+    "es": "Investigación Operativa",
+    "en": "Operations Research",
+    "ca": "Investigació Operativa",
+    "type": "subject"
+  },
+  "SID": {
+    "es": "Sistemas Inteligentes Distribuidos",
+    "en": "Distributed Intelligent Systems",
+    "ca": "Sistemes Intel·ligents Distribuïts",
+    "type": "subject"
+  },
+  "AC2": {
+    "es": "Arquitectura de Computadores II",
+    "en": "Computer Architecture II",
+    "ca": "Arquitectura de Computadors II",
+    "type": "subject"
+  },
+  "DSBM": {
+    "es": "Diseño de Sistemas Basados en Microcomputadores",
+    "en": "Design of Microcomputer-Based Systems",
+    "ca": "Disseny de Sistemes Basats en Microcomputadors",
+    "type": "subject"
+  },
+  "MP": {
+    "es": "Multiprocesadores",
+    "en": "Multiprocessors",
+    "ca": "Multiprocessadors",
+    "type": "subject"
+  },
+  "PEC": {
+    "es": "Proyecto de Ingeniería de Computadores",
+    "en": "Computer Engineering Project",
+    "ca": "Projecte d'Enginyeria de Computadors",
+    "type": "subject"
+  },
+  "SO2": {
+    "es": "Sistemas Operativos II",
+    "en": "Operating Systems II",
+    "ca": "Sistemes Operatius II",
+    "type": "subject"
+  },
+  "XC2": {
+    "es": "Redes de Computadores II",
+    "en": "Computer Networks II",
+    "ca": "Xarxes de Computadors II",
+    "type": "subject"
+  },
+  "CASO": {
+    "es": "Conceptos Avanzados de Sistemas Operativos",
+    "en": "Advanced Concepts of Operating Systems",
+    "ca": "Conceptes Avançats de Sistemes Operatius",
+    "type": "subject"
+  },
+  "CPD": {
+    "es": "Centros de Proceso de Datos",
+    "en": "Data Processing Centers",
+    "ca": "Centres de Procés de Dades",
+    "type": "subject"
+  },
+  "PAP": {
+    "es": "Programación y Arquitecturas Paralelas",
+    "en": "Parallel Programming and Architectures",
+    "ca": "Programació i Arquitectures Paral·leles",
+    "type": "subject"
+  },
+  "PCA": {
+    "es": "Programación Consciente de la Arquitectura",
+    "en": "Architecture-Aware Programming",
+    "ca": "Programació Conscient de l'Arquitectura",
+    "type": "subject"
+  },
+  "PDS": {
+    "es": "Procesado Digital de la Señal",
+    "en": "Digital Signal Processing",
+    "ca": "Processament Digital del Senyal",
+    "type": "subject"
+  },
+  "STR": {
+    "es": "Sistemas de Tiempo Real",
+    "en": "Real-Time Systems",
+    "ca": "Sistemes de Temps Real",
+    "type": "subject"
+  },
+  "VLSI": {
+    "es": "VLSI",
+    "en": "VLSI",
+    "ca": "VLSI",
+    "type": "subject"
+  },
+  "AS": {
+    "es": "Arquitectura del Software",
+    "en": "Software Architecture",
+    "ca": "Arquitectura del Software",
+    "type": "subject"
+  },
+  "ASW": {
+    "es": "Aplicaciones y Servicios Web",
+    "en": "Web Applications and Services",
+    "ca": "Aplicacions i Serveis Web",
+    "type": "subject"
+  },
+  "DBD": {
+    "es": "Diseño de Bases de Datos",
+    "en": "Database Design",
+    "ca": "Disseny de Bases de Dades",
+    "type": "subject"
+  },
+  "ER": {
+    "es": "Ingeniería de Requisitos",
+    "en": "Requirements Engineering",
+    "ca": "Enginyeria de Requisits",
+    "type": "subject"
+  },
+  "GPS": {
+    "es": "Gestión de Proyectos de Software",
+    "en": "Software Project Management",
+    "ca": "Gestió de Projectes de Software",
+    "type": "subject"
+  },
+  "PES": {
+    "es": "Proyecto de Ingeniería del Software",
+    "en": "Software Engineering Project",
+    "ca": "Projecte d'Enginyeria del Software",
+    "type": "subject"
+  },
+  "CAP": {
+    "es": "Conceptos Avanzados de Programación",
+    "en": "Advanced Programming Concepts",
+    "ca": "Conceptes Avançats de Programació",
+    "type": "subject"
+  },
+  "CBDE": {
+    "es": "Conceptos para Bases de Datos Especializadas",
+    "en": "Concepts for Specialized Databases",
+    "ca": "Conceptes per a Bases de Dades Especialitzades",
+    "type": "subject"
+  },
+  "CSI_EIS": {
+    "es": "Conceptos de Sistemas de Información",
+    "en": "Concepts of Information Systems",
+    "ca": "Conceptes de Sistemes d'Informació",
+    "type": "subject"
+  },
+  "ECSDI": {
+    "es": "Ingeniería del Conocimiento y Sistemas Distribuidos Inteligentes",
+    "en": "Knowledge Engineering and Distributed Intelligent Systems",
+    "ca": "Enginyeria del Coneixement i Sistemes Distribuïts Intel·ligents",
+    "type": "subject"
+  },
+  "SIM": {
+    "es": "Simulación",
+    "en": "Simulation",
+    "ca": "Simulació",
+    "type": "subject"
+  },
+  "SOAD": {
+    "es": "Sistemas Operativos para Aplicaciones Distribuidas",
+    "en": "Operating Systems for Distributed Applications",
+    "ca": "Sistemes Operatius per a Aplicacions Distribuïdes",
+    "type": "subject"
+  },
+  "ADEI": {
+    "es": "Análisis de Datos y Explotación de la Información",
+    "en": "Data Analysis and Information Exploitation",
+    "ca": "Anàlisi de Dades i Explotació de la Informació",
+    "type": "subject"
+  },
+  "DSI_SI": {
+    "es": "Diseño de Sistemas de Información",
+    "en": "Information Systems Design",
+    "ca": "Disseny de Sistemes d'Informació",
+    "type": "subject"
+  },
+  "NE": {
+    "es": "Negocio Electrónico",
+    "en": "Electronic Business",
+    "ca": "Negoci Electrònic",
+    "type": "subject"
+  },
+  "PSI": {
+    "es": "Proyecto de Sistemas de Información",
+    "en": "Information Systems Project",
+    "ca": "Projecte de Sistemes d'Informació",
+    "type": "subject"
+  },
+  "SIO": {
+    "es": "Sistemas de Información para Las Organitzaciones",
+    "en": "Information Systems for Organizations",
+    "ca": "Sistemes d'Informació per a Les Organitzacions",
+    "type": "subject"
+  },
+  "ABD": {
+    "es": "Administración de Bases de Datos",
+    "en": "Database Administration",
+    "ca": "Administració de Bases de Dades",
+    "type": "subject"
+  },
+  "EDO": {
+    "es": "Estrategia Digital en Las Organizaciones",
+    "en": "Digital Strategy in Organizations",
+    "ca": "Estratègia Digital en Les Organitzacions",
+    "type": "subject"
+  },
+  "MI": {
+    "es": "Marquéting en Internet",
+    "en": "Internet Marketing",
+    "ca": "Màrqueting a Internet",
+    "type": "subject"
+  },
+  "VPE": {
+    "es": "Viabilidad de Proyectos Empresariales",
+    "en": "Feasibility of Business Projects",
+    "ca": "Viabilitat de Projectes Empresarials",
+    "type": "subject"
+  },
+  "ASO": {
+    "es": "Administración de Sistemas Operativos",
+    "en": "Operating Systems Administration",
+    "ca": "Administració de Sistemes Operatius",
+    "type": "subject"
+  },
+  "PI": {
+    "es": "Protocolos de Internet",
+    "en": "Internet Protocols",
+    "ca": "Protocols d'Internet",
+    "type": "subject"
+  },
+  "PTI": {
+    "es": "Proyecto de Tecnologías de la Información",
+    "en": "Information Technology Project",
+    "ca": "Projecte de Tecnologies de la Informació",
+    "type": "subject"
+  },
+  "SI_TI": {
+    "es": "Seguridad Informática",
+    "en": "Computer Security",
+    "ca": "Seguretat Informàtica",
+    "type": "subject"
+  },
+  "SOA": {
+    "es": "Sistemas Operativos Avanzados",
+    "en": "Advanced Operating Systems",
+    "ca": "Sistemes Operatius Avançats",
+    "type": "subject"
+  },
+  "TXC": {
+    "es": "Tecnologías de Redes de Computadores",
+    "en": "Computer Networks Technologies",
+    "ca": "Tecnologies de Xarxes de Computadors",
+    "type": "subject"
+  },
+  "AD": {
+    "es": "Aplicaciones Distribuidas",
+    "en": "Distributed Applications",
+    "ca": "Aplicacions Distribuïdes",
+    "type": "subject"
+  },
+  "IM": {
+    "es": "Internet Móvil",
+    "en": "Mobile Internet",
+    "ca": "Internet Mòbil",
+    "type": "subject"
+  },
+  "SDX": {
+    "es": "Sistemas Distribuidos en Red",
+    "en": "Networked Distributed Systems",
+    "ca": "Sistemes Distribuïts en Xarxa",
+    "type": "subject"
+  },
+  "TCI": {
+    "es": "Transmisión y Codificación de la Información",
+    "en": "Information Transmission and Coding",
+    "ca": "Transmissió i Codificació de la Informació",
+    "type": "subject"
+  },
+  "APC": {
+    "es": "Arquitectura del PC",
+    "en": "PC Architecture",
+    "ca": "Arquitectura del PC",
+    "type": "subject"
+  },
+  "APSS": {
+    "es": "Habilidades Académicas y Profesionales de Expresión Oral en Inglés",
+    "en": "Academic and Professional Oral Expression Skills in English",
+    "ca": "Habilitats Acadèmiques i Professionals d'Expressió Oral en Anglès",
+    "type": "subject"
+},
+"ASDP": {
+"es": "Habilidades Académicas para el Desarrollo de Proyectos en Inglés",
+"en": "Academic Skills for Project Development in English",
+"ca": "Habilitats Acadèmiques per al Desenvolupament de Projectes en Anglès",
+"type": "subject"
+},
+"ASMI": {
+"es": "Aspectos Sociales y Medioambientales de la Informática",
+"en": "Social and Environmental Aspects of Informatics",
+"ca": "Aspectes Socials i Mediambientals de la Informàtica",
+"type": "subject"
+},
+"C": {
+"es": "Criptografía",
+"en": "Cryptography",
+"ca": "Criptografia",
+"type": "subject"
+},
+"CCQ": {
+"es": "Computación y Criptografía Cuánticas",
+"en": "Quantum Computing and Cryptography",
+"ca": "Computació i Criptografia Quàntiques",
+"type": "subject"
+},
+"CDI": {
+"es": "Compresión de Datos e Imágenes",
+"en": "Data and Image Compression",
+"ca": "Compressió de Dades i Imatges",
+"type": "subject"
+},
+"DCS": {
+"es": "Diseño de Curvas y Superficies",
+"en": "Design of Curves and Surfaces",
+"ca": "Disseny de Corbes i Superfícies",
+"type": "subject"
+},
+"ECE": {
+"es": "Ética en la Ciencia y la Ingeniería",
+"en": "Ethics in Science and Engineering",
+"ca": "Ètica en la Ciència i l'Enginyeria",
+"type": "subject"
+},
+"EET": {
+"es": "Educación, Ingeniería y Tecnología",
+"en": "Education, Engineering and Technology",
+"ca": "Educació, Enginyeria i Tecnologia",
+"type": "subject"
+},
+"FDM": {
+"es": "Física de los Dispositivos de Memoria",
+"en": "Physics of Memory Devices",
+"ca": "Física dels Dispositius de Memòria",
+"type": "subject"
+},
+"FOMAR": {
+"es": "Física Orientada a la Modelización y la Animación Realista",
+"en": "Physics Oriented to Modeling and Realistic Animation",
+"ca": "Física Orientada a la Modelització i l'Animació Realista",
+"type": "subject"
+},
+"GCS": {
+"es": "Gestión de la Ciberseguridad",
+"en": "Cybersecurity Management",
+"ca": "Gestió de la Ciberseguretat",
+"type": "subject"
+},
+"GEOC": {
+"es": "Geometría Computacional",
+"en": "Computational Geometry",
+"ca": "Geometria Computacional",
+"type": "subject"
+},
+"I2R3_OPT": {
+"es": "Introducción a la Investigación",
+"en": "Introduction to Research",
+"ca": "Introducció a la Recerca",
+"type": "subject"
+},
+"I2R6_OPT": {
+"es": "Introducción a la Investigación",
+"en": "Introduction to Research",
+"ca": "Introducció a la Recerca",
+"type": "subject"
+},
+"LDPE": {
+"es": "Liderazgo y Desarrollo Profesional en la Ingeniería",
+"en": "Leadership and Professional Development in Engineering",
+"ca": "Lideratge i Desenvolupament Professional en l'Enginyeria",
+"type": "subject"
+},
+"MD_OPT": {
+"es": "Minería de Datos",
+"en": "Data Mining",
+"ca": "Mineria de Dades",
+"type": "subject"
+},
+"PAE": {
+"es": "Proyecto Aplicado de Ingenieria",
+"en": "Applied Engineering Project",
+"ca": "Projecte Aplicat d'Enginyeria",
+"type": "subject"
+},
+"ROB": {
+"es": "Robótica",
+"en": "Robotics",
+"ca": "Robòtica",
+"type": "subject"
+},
+"SLDS": {
+"es": "Software Libre y Desarrollo Social",
+"en": "Free Software and Social Development",
+"ca": "Software Lliure i Desenvolupament Social",
+"type": "subject"
+},
+"TGA": {
+"es": "Tarjetas Gráficas y Aceleradores",
+"en": "Graphics Cards and Accelerators",
+"ca": "Targetes Gràfiques i Acceleradors",
+"type": "subject"
+},
+"VC": {
+"es": "Visión por Computador",
+"en": "Computer Vision",
+"ca": "Visió per Computador",
+"type": "subject"
+},
+"VJ": {
+"es": "Videojuegos",
+"en": "Video Games",
+"ca": "Videojocs",
+"type": "subject"
+},
+"WSE": {
+"es": "Habilidades de Expresión Escrita en Inglés para la Ingeniería",
+"en": "English Written Expression Skills for Engineering",
+"ca": "Habilitats d'Expressió Escrita en Anglès per a l'Enginyeria",
+"type": "subject"
+}
+}
+
