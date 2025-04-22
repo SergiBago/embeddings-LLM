@@ -5,7 +5,7 @@ import json
 import re
 
 # Configuration paths
-CONFIG_FILE = "data/config/config.json"
+CONFIG_FILE = "config/config.json"
 
 # Historial de mensajes (lo gestionas tú desde fuera)
 chat_history = []
@@ -38,7 +38,7 @@ collection = chroma_client.get_or_create_collection(name="memory")
 openai_client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
 # Cargar el diccionario desde el JSON
-with open('data/config/dictionary.json', 'r', encoding='utf-8') as f:
+with open('config/dictionary.json', 'r', encoding='utf-8') as f:
     dictionary = json.load(f)
 
 

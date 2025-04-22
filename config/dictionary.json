@@ -1,14 +1,19 @@
 {
     "FIB": {
-      "es": "Facultat d'Informàtica de Barcelona",
+      "es": "Facultad de Informática de Barcelona",
       "en": "Barcelona School of Informatics",
       "type": "organization"
     },
     "UPC": {
-      "es": "Universitat Politècnica de Catalunya",
+      "es": "Universidad Politécnica de Cataluña",
       "en": "Polytechnic University of Catalonia",
       "type": "organization"
     },
+  "DGIS": {
+    "es": "Desarrollo y Gestión de Sistemas de Información",
+    "en": "Development and Management of Information Systems",
+    "type": "subject"
+  },
     "ICFO": {
       "es": "Instituto de Ciencias Fotónicas",
       "en": "Institute of Photonic Sciences",

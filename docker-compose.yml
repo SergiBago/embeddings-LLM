@@ -7,3 +7,4 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     volumes:
       - ./docker_data:/app/data
+      - ./config:/app/config
