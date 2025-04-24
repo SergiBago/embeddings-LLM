@@ -12,7 +12,7 @@ if [ -z "$(ls -A /app/data/chromadb_store)" ]; then
   apt-get update && apt-get install -y wget unzip
 
   wget --no-check-certificate \
-    'https://drive.usercontent.google.com/download?id=10Qj_WlAJhQ2DzWsmLt_PnmIamebL_rkt&export=download&authuser=0&confirm=t&uuid=91ef7bd7-5a0b-4a47-ab27-e92001ccbd9e&at=APcmpozeQz65CzgOyOKkvnaCVqTM:1745307678676' \
+    'https://drive.usercontent.google.com/download?id=1esTCNe5mklMHb6_kGUkZWBbjAYh_jwBN&export=download&authuser=0&confirm=t&uuid=7940e85f-b767-4b07-90f5-5c8b1f6f9238&at=APcmpowRuvnSSbt_pSYapmLpgK7I:1745500048852' \
     -O /app/data/temp.zip
 
   echo "[Entrypoint] Descomprimiendo base de datos..."
