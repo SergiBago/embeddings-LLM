@@ -3,10 +3,10 @@ set -e
 
 echo "[Entrypoint] Verificando estructura de carpetas..."
 mkdir -p /app/data/markdown
-mkdir -p /app/data/chromadb_store_en
+mkdir -p /app/data/chromadb_store
 
 # Verificamos si la carpeta está vacía antes de descargar
-if [ -z "$(ls -A /app/data/chromadb_store_en)" ]; then
+if [ -z "$(ls -A /app/data/chromadb_store)" ]; then
   echo "[Entrypoint] No se encontró la base de datos. Descargando..."
 
   apt-get update && apt-get install -y wget unzip

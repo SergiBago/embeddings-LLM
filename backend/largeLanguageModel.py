@@ -76,41 +76,6 @@ def call_openai(prompt: str) -> str:
     )
     return response.choices[0].message.content
 
-def improve_user_prompt_old(user_prompt):
-    # Extract words robustly
-    palabras = re.split(r'[,\s.!?¿¡;:\(\)\[\]\{\}]+', user_prompt)
-
-    # Get detailed context for known acronyms
-    contexto_items = []
-    for palabra in palabras:
-        if palabra in dictionary:
-            entry = dictionary[palabra]
-            details = [f"**{palabra}**"]
-            if 'es' in entry:
-                details.append(f"es: {entry['es']}")
-            if 'en' in entry:
-                details.append(f"en: {entry['en']}")
-            if 'description' in entry:
-                details.append(f"desc: {entry['description']}")
-            if 'type' in entry:
-                details.append(f"type: {entry['type']}")
-            contexto_items.append(" | ".join(details))
-
-    contexto = "\n".join(contexto_items)
-
-    # Get semantic embedding results
-    query_embedding = get_openai_embedding(user_prompt)
-    results = collection.query(query_embeddings=query_embedding, n_results=10)
-    info = "".join([f"- {meta['sentence']}\n" for meta in results["metadatas"][0]])
-
-    # Format final prompt
-    prompt = PROMPT_IMPROVEMENT.format(
-        user_query=user_prompt,
-        dictionary=contexto,
-        current_embeddings=info
-    )
-
-    return call_openai(prompt)
 
 def extract_idx_from_id(sentence_id):
     # Extrae el índice numérico de algo como 'ruta/sentence23_part0'
@@ -190,7 +155,7 @@ def improve_user_prompt(user_prompt, chat_history_local):
     # Obtener embeddings para esta consulta
     query_embedding = get_openai_embedding(user_prompt)
 
-    info = get_embedding_results_info(query_embedding, 4, 1)
+    info = get_embedding_results_info(query_embedding, 14, 1)
 
     if info is None:
         return None
@@ -224,7 +189,7 @@ def handle_query(query: str, chat_history:[]):
     if not query_embedding:
         return "Error generating embedding for query."
 
-    info = get_embedding_results_info(query_embedding, 5,1)
+    info = get_embedding_results_info(query_embedding, 15,1)
 
     if info is None:
         print("No relevant info found.")
