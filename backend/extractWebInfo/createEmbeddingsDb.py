@@ -128,9 +128,9 @@ def get_openai_embedding_pdfs(texts):
     
 
 def split_into_sentences(text):
-    max_tokens = 1400
+    max_tokens = 1000
     # Patrón para detectar títulos con cierto formato
-    sections = re.split(r'\n{3,}', text)  # separa por líneas vacías dobles
+    sections = re.split(r'\n{4,}', text)  # separa por líneas vacías dobles
     chunks = []
 
     for section in sections:
@@ -186,18 +186,19 @@ def process_markdown_file(root, filename, url):
             embeddings = get_openai_embedding(sentence)
             if embeddings:
                 for part_idx, embedding in enumerate(embeddings):
-                    sentence_id = f"{file_url}_sentence{idx}_part{part_idx}"
-                    existing = collection.get(ids=[sentence_id])
-                    if not existing["ids"]:  # si el ID no existe, lo añadimos
-                        collection.add(
-                            ids=[sentence_id],
-                            embeddings=[embedding],
-                            metadatas=[{
-                                "filename": file_url,
-                                "sentence": sentence,
-                                "sentence_index": idx
-                            }]
-                        )
+                    sentence_id = f"{relative_path}_sentence{idx}_part{part_idx}"
+                    with lock:
+                        existing = collection.get(ids=[sentence_id])
+                        if not existing["ids"]:  # si el ID no existe, lo añadimos
+                            collection.add(
+                                ids=[sentence_id],
+                                embeddings=[embedding],
+                                metadatas=[{
+                                    "filename": file_url,
+                                    "sentence": sentence,
+                                    "sentence_index": idx
+                                }]
+                            )
 
         # Eliminar el archivo después de procesarlo
         try:
@@ -240,21 +241,25 @@ def process_pdf_file(root, filename, url):
         if embeddings:
             for idx, (sentence, embedding) in enumerate(zip(sentences, embeddings)):
                 sentence_id = f"{relative_path}_sentence{idx}_part0"
-                existing = collection.get(ids=[sentence_id])
-                if not existing["ids"]:  # si el ID no existe, lo añadimos
-                    collection.add(
-                        ids=[sentence_id],
-                        embeddings=[embedding],
-                        metadatas=[{
-                            "filename": file_url,
-                            "sentence": sentence,
-                            "sentence_index": idx
-                        }]
-                    )
+                with lock:
+                    existing = collection.get(ids=[sentence_id])
+                    if not existing["ids"]:  # si el ID no existe, lo añadimos
+                        collection.add(
+                            ids=[sentence_id],
+                            embeddings=[embedding],
+                            metadatas=[{
+                                "filename": file_url,
+                                "sentence": sentence,
+                                "sentence_index": idx
+                            }]
+                        )
 
         # Eliminar el archivo después de procesarlo
-        os.remove(filepath)
-        print(f"Deleted file: {filename}")
+        try:
+            os.remove(filepath)
+            print(f"Deleted file: {filename}")
+        except Exception as e:
+            print(f"Error deleting file {filename}: {e}")
 
     except Exception as e:
         print(f"Error processing PDF {filename}: {e}")
@@ -279,7 +284,7 @@ def process_folder_files(url, base_folder, task_id, progress_dict):
     DATA_FOLDER = base_folder
     futures = []
 
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=20) as executor:
         for root, _, files in os.walk(DATA_FOLDER):
             for filename in files:
                 if filename.endswith(".pdf") or filename.endswith(".md"):

@@ -5,6 +5,8 @@ import json
 import re
 from collections import OrderedDict
 
+from networkx.classes import neighbors
+
 # Configuration paths
 CONFIG_FILE = "config/config.json"
 
@@ -18,7 +20,7 @@ with open(CONFIG_FILE, 'r', encoding='utf-8') as config_file:
 PROMPT_IMPROVEMENT = config["prompt_improvement"]
 LLM_PROMPT_TEMPLATE = config["llm_prompt_template"]
 
-CHROMA_DB_FOLDER = "docker_data/chromadb_store_en"
+CHROMA_DB_FOLDER = "data/chromadb_store"
 OPENAI_MODEL = "text-embedding-3-small"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
@@ -121,7 +123,9 @@ def get_embedding_results_info(query_embedding, results, join_x_sentences):
 
     all_ids = []
 
+    info =""
     for current_id in results['ids'][0]:
+        current_neighbors=[]
         idx = extract_idx_from_id(current_id)
         if idx is None:
             continue
@@ -132,15 +136,27 @@ def get_embedding_results_info(query_embedding, results, join_x_sentences):
             if neighbor_idx < 0:
                 continue
             neighbor_id = f"{base_path}_sentence{neighbor_idx}_part0"
-            all_ids.append(neighbor_id)
+            current_neighbors.append(neighbor_id)
+            #all_ids.append(neighbor_id)
 
+        # Elimina duplicados preservando el orden
+        unique_ids = list(OrderedDict.fromkeys(current_neighbors))
+        if len(unique_ids) == 0:
+            continue
+        neighbors = collection.get(ids=unique_ids)
+        info += "".join([f"- {meta['sentence']}\n" for meta in neighbors["metadatas"]]) + "\n\n\n\n\n"
+
+    if info == "":
+        return None
     # Elimina duplicados preservando el orden
-    unique_ids = list(OrderedDict.fromkeys(all_ids))
+    #unique_ids = list(OrderedDict.fromkeys(all_ids))
 
+    #if len(unique_ids) == 0:
+    #    return None
     # Recupera las frases por ID
-    neighbors = collection.get(ids=unique_ids)
+    #neighbors = collection.get(ids=unique_ids)
 
-    info = "".join([f"- {meta['sentence']}\n" for meta in neighbors["metadatas"]])
+    #info = "".join([f"- {meta['sentence']}\n\n\n\n\n" for meta in neighbors["metadatas"]])
 
     return info
 
@@ -174,8 +190,10 @@ def improve_user_prompt(user_prompt, chat_history_local):
     # Obtener embeddings para esta consulta
     query_embedding = get_openai_embedding(user_prompt)
 
-    info = get_embedding_results_info(query_embedding, 6, 2)
+    info = get_embedding_results_info(query_embedding, 4, 1)
 
+    if info is None:
+        return None
     # Construir el nuevo prompt con historial
     full_prompt = PROMPT_IMPROVEMENT.format(
         user_query=user_prompt,
@@ -191,62 +209,28 @@ def improve_user_prompt(user_prompt, chat_history_local):
 def extract_response(full_response, prompt_marker):
     return full_response.split(prompt_marker)[-1].strip() if prompt_marker in full_response else full_response.strip()
 
-# Interactive search
-def handle_query_old(query:str):
-
-    # Improve user query using LLM
-    improved_query = improve_user_prompt(query)
-
-    # Generate query embedding
-    query_embedding = get_openai_embedding(improved_query)
-    if not query_embedding:
-        print("Error generating embedding for query.")
-        return "Error generating embedding for query."
-
-    # Query ChromaDB
-    results = collection.query(
-        query_embeddings=query_embedding,
-        n_results=6
-    )
-
-    if not results["ids"] or not results["ids"][0]:
-        print("No relevant info found.")
-        return "No relevant information found."
-
-    # Build context information
-    info = ""
-    for idx, metadata in enumerate(results["metadatas"][0]):
-        sentence = results["metadatas"][0][idx]['sentence']
-        info += f"- {sentence}\n"
-
-    # Build LLM prompt
-    prompt = LLM_PROMPT_TEMPLATE.format(user_query=improved_query, info=info)
-
-    response = call_openai(prompt)
-
-    print("\nAnswer from LLM:\n")
-    print(response)
-    return response
 
 def handle_query(query: str, chat_history:[]):
 
     # Mejorar la consulta con historial
     improved_query = improve_user_prompt(query, chat_history)
 
+    if improved_query is None :
+        print("No relevant info found.")
+        return "No relevant information found."
+
     # Guardar prompt mejorado en historial antes de la respuesta
     query_embedding = get_openai_embedding(improved_query)
     if not query_embedding:
         return "Error generating embedding for query."
 
-    info = get_embedding_results_info(query_embedding, 9,4)
+    info = get_embedding_results_info(query_embedding, 5,1)
 
-    #results = collection.query(query_embeddings=query_embedding, n_results=10)
-    #if not results["ids"] or not results["ids"][0]:
-    #    return "No relevant information found."
+    if info is None:
+        print("No relevant info found.")
+        return "No relevant information found."
 
-    #info = "\n".join(f"- {m['sentence']}" for m in results["metadatas"][0])
-
-    final_prompt = LLM_PROMPT_TEMPLATE.format(user_query=improved_query, info=info)
+    final_prompt = LLM_PROMPT_TEMPLATE.format(user_query=query, improved_query=improved_query, info=info)
     response = call_openai(final_prompt)
 
     # Añadir consulta al historial
