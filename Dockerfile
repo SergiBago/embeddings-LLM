@@ -8,13 +8,16 @@ COPY frontend /app/frontend
 COPY requirements.txt .
 
 COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+RUN apt-get update && apt-get install -y wget unzip
 
 RUN mkdir /app/data
 RUN mkdir /app/config
 
 # Instalar wget y unzip para poder descargar y descomprimir la BD de google drive
-RUN apt-get update && apt-get install -y wget unzip
+RUN apt-get update && apt-get install -y wget unzip dos2unix
+
+RUN dos2unix /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 RUN pip install --upgrade pip && pip install --no-cache-dir --timeout 60 -r requirements.txt
 
